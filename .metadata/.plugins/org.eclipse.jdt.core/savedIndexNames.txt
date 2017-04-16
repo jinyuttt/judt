@@ -1,0 +1,20 @@
+INDEX VERSION 1.130+D:\jinyu\udt-java\.metadata\.plugins\org.eclipse.jdt.core
+2830727118.index
+2169165656.index
+560828727.index
+1887015042.index
+3291679165.index
+932654797.index
+992076436.index
+3260012673.index
+2176375984.index
+2001666487.index
+977830713.index
+4056897259.index
+1805218701.index
+70319907.index
+1340367406.index
+455574416.index
+2492248846.index
+4084556726.index
+1942129866.index
