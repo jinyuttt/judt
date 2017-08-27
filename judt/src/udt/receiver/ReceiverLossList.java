@@ -105,6 +105,7 @@ public class ReceiverLossList {
 		return result;
 	}
 	
+	@Override
 	public String toString(){
 		return backingList.toString();
 	}

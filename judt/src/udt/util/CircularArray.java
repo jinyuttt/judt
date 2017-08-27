@@ -81,6 +81,7 @@ public class CircularArray<T>{
 		return circularArray.size();
 	}
 	
+	@Override
 	public String toString(){
 		return circularArray.toString();
 	}

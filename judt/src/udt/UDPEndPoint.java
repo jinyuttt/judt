@@ -40,9 +40,6 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.SynchronousQueue;
@@ -83,135 +80,9 @@ public class UDPEndPoint {
 	private volatile boolean stopped=false;
 
 	public static final int DATAGRAM_SIZE=1400;
+	
+	private volatile int sessionnum=0;//cd 添加 临时统计
 
-	//保持同一客户端不同的处理ID;
-	//保持所有的seesion直到关闭
-	private final Map<Long,List<Long>> hash=new HashMap<Long,List<Long>>();
-	
-	/*
-	 * 保持同一目的源的seesion
-	 */
-	public void Add(Long id,Long peerID)
-	{
-	    List<Long> lstPeer= hash.getOrDefault(id, null);
-	    if(lstPeer==null)
-	    {
-	        lstPeer=new LinkedList<Long>();
-	        lstPeer.add(peerID);
-	        hash.put(id, lstPeer);
-	    }
-	    else
-	    {
-	        System.out.println("源ID1，个数："+id+","+lstPeer.size());
-	        System.out.println("seeson:"+this.sessions.keySet());
-	        System.out.println("关联seesion"+this.hash.entrySet());
-	        lstPeer.add(peerID);
-	    }
-	    
-	}
-	
-	/*
-	 * 关闭整个Session
-	 * 主要是其中的循环代码
-	 */
-	private void closeSession(UDTSession session) 
-	{
-	    if(session!=null)
-        {
-           UDTSocket socket=session.getSocket();
-           if(socket!=null)
-           {
-             System.out.println("停止socket:"+session.getSocketID());
-             try
-             {
-                 socket.close();
-                 socket.getReceiver().stop();//关闭循环检查发送信息
-             }
-             catch(Exception ex)
-             {
-                 System.out.println("关闭Session的Receiver失败");
-             }
-             try
-             {
-               socket.getOutputStream().pauseOutput();//关闭整个循环
-             }
-             catch(Exception ex)
-             {
-                 System.out.println("关闭Session的OutputStream失败");
-             }
-             
-           }
-       
-           
-        }
-	}
-	/*
-	 * 客户端ID
-	 * 删除同一目的源的所有session
-	 * 关闭session
-	 * ID来自远端目的地址
-	 */
-	private void ClearPeer(Long id)
-	{
-	    List<Long> lstPeer= hash.getOrDefault(id, null);
-	    if(lstPeer!=null)
-	    {
-	        System.out.println("源ID2，个数："+id+","+lstPeer.size());
-	        System.out.println("seeson:"+this.sessions.keySet());
-            System.out.println("关联seesion"+this.hash.entrySet());
-	        for(Long peerid:lstPeer)
-	        {
-	            UDTSession session=this.sessions.remove(peerid);
-	            this.closeSession(session);
-	        }
-	        hash.remove(id);
-	     }
-	    
-	}
-	/*
-	 * 客户端ID;
-     * 删除同一目的源的其他session
-     */
-    public void notePeer(Long id,Long myid)
-    {
-        List<Long> lstPeer= hash.getOrDefault(id, null);
-        System.out.println(this.hash.entrySet());
-        if(lstPeer!=null)
-        {
-            for(Long peerid:lstPeer)
-            {
-                if(myid==peerid)
-                {
-                    continue;
-                }
-                UDTSession session= this.sessions.remove(peerid);
-               this.closeSession(session);
-                
-            }
-        }
-    }
-    
-    /*
-     * 移除无用的session
-     * 并且关闭
-     * 必须是真正的数据通信session
-     * 关闭所有的数据
-     */
-    public void Remove(Long id)
-    {
-        UDTSession session=sessions.remove(id);
-        this.closeSession(session);
-        System.out.println("seeson:"+this.sessions.keySet());
-        System.out.println("关联seesion"+this.hash.entrySet());
-        //socket是一对一的，关闭该session,对应的其它session也应移除；
-        if(session!=null)
-        {
-          Long did= session.getDestination().getSocketID();//获取对方端的ID
-          this.ClearPeer(did);
-        }
-       
-        
-    }
 	/**
 	 * create an endpoint on the given socket
 	 * 
@@ -285,6 +156,7 @@ public class UDPEndPoint {
 		serverSocketMode=serverSocketModeEnabled;
 		//start receive thread
 		Runnable receive=new Runnable(){
+			@Override
 			public void run(){
 				try{
 					doReceive();
@@ -331,17 +203,24 @@ public class UDPEndPoint {
 
 	public void addSession(Long destinationID,UDTSession session){
 		logger.info("Storing session <"+destinationID+">");
+		sessionnum++;
 		sessions.put(destinationID, session);
 	}
 
 	public UDTSession getSession(Long destinationID){
 		return sessions.get(destinationID);
 	}
-
+    public UDTSession removeSession(long socketid)
+    {
+    	//cd
+    	sessionnum--;
+    	logger.info("Storing Sessionnum:"+sessionnum);
+    	return sessions.remove(socketid);
+    }
 	public Collection<UDTSession> getSessions(){
 		return sessions.values();
 	}
-   
+
 	/**
 	 * wait the given time for a new connection
 	 * @param timeout - the time to wait
@@ -371,7 +250,7 @@ public class UDPEndPoint {
 	//MeanValue v=new MeanValue("receiver processing ",true, 256);
 	
 	private int n=0;
-	private int m=0;//計算
+	
 	private final Object lock=new Object();
 	
 	protected void doReceive()throws IOException{
@@ -387,31 +266,17 @@ public class UDPEndPoint {
 					
 					Destination peer=new Destination(dp.getAddress(), dp.getPort());
 					int l=dp.getLength();
-					UDTPacket packet=null;
-					try
-					{
-					  packet=PacketFactory.createPacket(dp.getData(),l);
-					  if(packet==null)
-					  {
-					      continue;
-					  }
-					}
-					catch(Exception ex)
-					{
-					    continue;
-					}
-                    lastPacket=packet;
-					
+					UDTPacket packet=PacketFactory.createPacket(dp.getData(),l);
+					lastPacket=packet;
+
 					//handle connection handshake 
 					if(packet.isConnectionHandshake()){
 						synchronized(lock){
-						   
 							Long id=Long.valueOf(packet.getDestinationID());
 							UDTSession session=sessions.get(id);
 							if(session==null){
 								session=new ServerSession(dp,this);
 								addSession(session.getSocketID(),session);
-								//
 								//TODO need to check peer to avoid duplicate server session
 								if(serverSocketMode){
 									logger.fine("Pooling new request.");
@@ -420,8 +285,7 @@ public class UDPEndPoint {
 								}
 							}
 							peer.setSocketID(((ConnectionHandshake)packet).getSocketID());
-							session.received(packet,peer);//回發送发送握手信息
-							
+							session.received(packet,peer);
 						}
 					}
 					else{
@@ -437,20 +301,13 @@ public class UDPEndPoint {
 							lastDestID=dest;
 						}
 						if(session==null){
+							n++;
 							if(n%100==1){
-							    logger.info("没有找到session："+dest);
 								logger.warning("Unknown session <"+dest+"> requested from <"+peer+"> packet type "+packet.getClass().getName());
 							}
 						}
 						else{
-						    n=0;
-						    m++;
-						    if(m%10000==1)
-						    {
-						        logger.info("sesseion num:"+this.sessions.size());
-						    }
 							session.received(packet,peer);
-							
 						}
 					}
 				}catch(SocketException ex){
@@ -470,18 +327,14 @@ public class UDPEndPoint {
 		DatagramPacket dgp = packet.getSession().getDatagram();
 		dgp.setData(data);
 		dgSocket.send(dgp);
-		
 	}
 
+	@Override
 	public String toString(){
 		return  "UDPEndpoint port="+port;
 	}
 
 	public void sendRaw(DatagramPacket p)throws IOException{
 		dgSocket.send(p);
-	}
-	public void  Dispose()
-	{
-	    sessions.clear();
 	}
 }

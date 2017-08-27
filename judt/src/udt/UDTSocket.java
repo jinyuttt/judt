@@ -48,11 +48,13 @@ import udt.packets.DataPacket;
  * 
  */
 public class UDTSocket {
-	
+	//一个session对应一个udtsocket
 	//endpoint
 	private final UDPEndPoint endpoint;
 	
 	private volatile boolean active;
+	
+	private volatile boolean close=false;//关闭标识，cd
 	
     //processing received data
 	private UDTReceiver receiver;
@@ -104,6 +106,10 @@ public class UDTSocket {
 		return endpoint;
 	}
 
+	 public boolean isClose()
+	 {
+	     return close;
+	 }
 	/**
 	 * get the input stream for reading from this socket
 	 * @return
@@ -222,6 +228,7 @@ public class UDTSocket {
 		if(inputStream!=null)inputStream.close();
 		if(outputStream!=null)outputStream.close();
 		active=false;
+		close=true;
 	}
 
 }

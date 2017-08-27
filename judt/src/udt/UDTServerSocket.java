@@ -89,12 +89,6 @@ public class UDTServerSocket {
 	public void shutDown(){
 		shutdown=true;
 		endpoint.stop();
-		{
-		    //没有网络应用了，关闭所有seesion
-		    //session本身没有关闭的东西
-		    //而是socket的UDTReceiver与UDTSender
-		    endpoint.Dispose();
-		}
 	}
 	
 	public UDPEndPoint getEndpoint(){

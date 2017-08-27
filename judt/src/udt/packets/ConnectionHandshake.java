@@ -69,6 +69,7 @@ public class ConnectionHandshake extends ControlPacket {
 	}
 	
 	//faster than instanceof...
+	@Override
 	public boolean isConnectionHandshake(){
 		return true;
 	}
@@ -182,6 +183,7 @@ public class ConnectionHandshake extends ControlPacket {
 	}
 	
 	
+	@Override
 	public String toString(){
 		StringBuilder sb=new StringBuilder();
 		sb.append("ConnectionHandshake [");

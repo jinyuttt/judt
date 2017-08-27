@@ -51,7 +51,7 @@ public class ClientSession extends UDTSession {
 	private static final Logger logger=Logger.getLogger(ClientSession.class.getName());
 
 	private UDPEndPoint endPoint;
- 
+
 	public ClientSession(UDPEndPoint endPoint, Destination dest)throws SocketException{
 		super("ClientSession localPort="+endPoint.getLocalPort(),dest);
 		this.endPoint=endPoint;
@@ -67,12 +67,15 @@ public class ClientSession extends UDTSession {
 
 	public void connect() throws InterruptedException,IOException{
 		int n=0;
+		
 		while(getState()!=ready){
+		   
 			sendHandShake();
 			if(getState()==invalid)throw new IOException("Can't connect!");
 			n++;
 			if(getState()!=ready)Thread.sleep(500);
 		}
+		
 		cc.init();
 		logger.info("Connected, "+n+" handshake packets sent");		
 	}
@@ -86,7 +89,7 @@ public class ClientSession extends UDTSession {
 			ConnectionHandshake hs=(ConnectionHandshake)packet;
 
 			logger.info("Received connection handshake from "+peer+"\n"+hs);
-
+       
 			if (getState()!=ready) {
 				if(hs.getConnectionType()==1){
 					try{
@@ -105,10 +108,11 @@ public class ClientSession extends UDTSession {
 						//TODO validate parameters sent by peer
 						long peerSocketID=hs.getSocketID();
 						destination.setSocketID(peerSocketID);
-						setInitialSequenceNumber(hs.getInitialSeqNo());
 						setState(ready);
-						//System.out.println("设置状态完成！");
-						socket=new UDTSocket(endPoint,this);		
+						this.setInitialSequenceNumber(hs.getInitialSeqNo());//cd 必须重置
+						socket=new UDTSocket(endPoint,this);
+						
+						
 					}catch(Exception ex){
 						logger.log(Level.WARNING,"Error creating socket",ex);
 						setState(invalid);
@@ -123,20 +127,13 @@ public class ClientSession extends UDTSession {
 			if(packet instanceof Shutdown){
 				setState(shutdown);
 				active=false;
-				 logger.info("接收关闭消息,ClientSession close");
 				logger.info("Connection shutdown initiated by the other side.");
-//				//清除客户端对应的所有seesion
-//				this.endPoint.ClearPeer(destination.getSocketID());
-//				//清除当前seession
-//                this.endPoint.Remove(this.mySocketID);
 				return;
 			}
 			active = true;
 			try{
-				//logger.info("ClientSession recvice data.");
-			   
 				if(packet.forSender()){
-				    socket.getSender().receive(lastPacket);
+					socket.getSender().receive(lastPacket);
 				}else{
 					socket.getReceiver().receive(lastPacket);	
 				}
@@ -184,18 +181,6 @@ public class ClientSession extends UDTSession {
 	public UDTPacket getLastPkt(){
 		return lastPacket;
 	}
-
-    @Override
-    public void Dispose(Long id) {
-     
-        endPoint.Remove(id);
-    }
-
-    @Override
-    public void Dispose() {
-        endPoint.Remove(this.mySocketID);
-        
-    }
 
 
 }

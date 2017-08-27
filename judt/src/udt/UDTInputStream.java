@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import udt.util.ReceiveBuffer;
 
 /**
@@ -92,7 +91,7 @@ public class UDTInputStream extends InputStream {
 	private AppData currentChunk=null;
 	//offset into currentChunk
 	int offset=0;
-
+    long id=-1;
 	@Override
 	public int read(byte[]target)throws IOException{
 		try{
@@ -211,13 +210,14 @@ public class UDTInputStream extends InputStream {
 		public AppData(long sequenceNumber, byte[]data){
 			this.sequenceNumber=sequenceNumber;
 			this.data=data;
-			//System.out.println("AppData接收大小："+data.length);
 		}
 
+		@Override
 		public int compareTo(AppData o) {
 			return (int)(sequenceNumber-o.sequenceNumber);
 		}
 
+		@Override
 		public String toString(){
 			return sequenceNumber+"["+data.length+"]";
 		}

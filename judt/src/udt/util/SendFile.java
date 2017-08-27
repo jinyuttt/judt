@@ -77,6 +77,7 @@ public class SendFile extends Application{
 		super.configure();
 	}
 
+	@Override
 	public void run(){
 		configure();
 		try{
@@ -133,6 +134,7 @@ public class SendFile extends Application{
 			memMapped=false;//true;
 		}
 
+		@Override
 		public void run(){
 			try{
 				logger.info("Handling request from "+socket.getSession().getDestination());
@@ -201,7 +203,7 @@ public class SendFile extends Application{
 
 
 	@SuppressWarnings("resource")
-	private static void copyFile(File file, OutputStream os)throws Exception{
+    private static void copyFile(File file, OutputStream os)throws Exception{
 		FileChannel c=new RandomAccessFile(file,"r").getChannel();
 		MappedByteBuffer b=c.map(MapMode.READ_ONLY, 0, file.length());
 		b.load();

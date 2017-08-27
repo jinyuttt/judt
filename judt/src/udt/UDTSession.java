@@ -107,6 +107,7 @@ public abstract class UDTSession {
 	
 	private final static AtomicLong nextSocketID=new AtomicLong(20+new Random().nextInt(5000));
 	
+	
 	public UDTSession(String description, Destination destination){
 		statistics=new UDTStatistics(description);
 		mySocketID=nextSocketID.incrementAndGet();
@@ -129,8 +130,6 @@ public abstract class UDTSession {
 	public abstract void received(UDTPacket packet, Destination peer);
 	
 	
-	public abstract void Dispose(Long id);
-	public abstract void Dispose();
 	public UDTSocket getSocket() {
 		return socket;
 	}
@@ -224,6 +223,7 @@ public abstract class UDTSession {
 		return dgPacket;
 	}
 	
+	@Override
 	public String toString(){
 		StringBuilder sb=new StringBuilder();
 		sb.append(super.toString());

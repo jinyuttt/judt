@@ -197,6 +197,7 @@ public class UDTReceiver {
 	//starts the sender algorithm
 	private void start(){
 		Runnable r=new Runnable(){
+			@Override
 			public void run(){
 				try{
 					nextACK=Util.getCurrentTime()+ackTimerInterval;
@@ -223,24 +224,6 @@ public class UDTReceiver {
 	protected void receive(UDTPacket p)throws IOException{
 		if(storeStatistics)dgReceiveInterval.end();
 		handoffQueue.offer(p);
-		if(p instanceof DataPacket)
-		{
-		    try
-		    {
-		      DataPacket dp=(DataPacket) p;
-		    if(dp!=null)
-		      {
-		    if(dp.getData().length<1000)
-		    {
-		        System.out.println("½ÓÊÕÎª:"+dp.getData().length);
-		    }
-		      }
-		    }
-		    catch(Exception ex)
-		    {
-		        
-		    }
-		}
 		if(storeStatistics)dgReceiveInterval.begin();
 	}
 
@@ -359,8 +342,6 @@ public class UDTReceiver {
 				sendShutdown();
 				stop();
 				logger.info("Session "+session+" expired.");
-				String info="expCount: "+expCount+" connectionExpiryDisabled:"+connectionExpiryDisabled+"stop:"+stopped;
-				logger.info(info);
 				return;
 			}
 		}
@@ -605,6 +586,7 @@ public class UDTReceiver {
 		session.getSocket().getSender().stop();
 	}
 
+	@Override
 	public String toString(){
 		StringBuilder sb=new StringBuilder();
 		sb.append("UDTReceiver ").append(session).append("\n");

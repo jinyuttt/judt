@@ -83,11 +83,13 @@ public class ReceiverLossListEntry implements Comparable<ReceiverLossListEntry> 
 	/**
 	 * order by increasing sequence number
 	 */
+	@Override
 	public int compareTo(ReceiverLossListEntry o) {
 		return (int)(sequenceNumber-o.sequenceNumber);
 	}
 
 
+	@Override
 	public String toString(){
 		return sequenceNumber+"[k="+k+",time="+lastFeedbacktime+"]";
 	}

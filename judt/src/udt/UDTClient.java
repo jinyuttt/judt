@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,7 +49,7 @@ public class UDTClient {
 	private static final Logger logger=Logger.getLogger(UDTClient.class.getName());
 	private final UDPEndPoint clientEndpoint;
 	private ClientSession clientSession;
-
+	private boolean close=false;
 
 	public UDTClient(InetAddress address, int localport)throws SocketException, UnknownHostException{
 		//create endpoint
@@ -128,40 +129,19 @@ public class UDTClient {
 			shutdown.setSession(clientSession);
 			try{
 				clientEndpoint.doSend(shutdown);
+				TimeUnit.MILLISECONDS.sleep(100);
 			}
-			catch(IOException e)
+			catch(Exception e)
 			{
 				logger.log(Level.SEVERE,"ERROR: Connection could not be stopped!",e);
 			}
-			//是否采用衰减
-			//改为逻辑上的关闭
-		//	clientSession.getSocket().getReceiver().stop();
-			//clientSession.getSocket().getSender().pause();
-		//	clientEndpoint.stop();
-			
-			{
-//			clientEndpoint.Dispose();
-//			//另外的思路
-//			clientSession.getSocket().close();//
-			//只是用户不能再使用通信
-			}
+			clientSession.getSocket().getReceiver().stop();
+			clientEndpoint.stop();
+			//cd 添加
+			clientEndpoint.removeSession(clientSession.getSocketID());
+			clientSession.getSocket().getSender().stop();
+			close=true;
 		}
-	}
-	public  void Close()
-	{
-	    try {
-            shutdown();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-	   try {
-        clientSession.getSocket().getReceiver().stop();
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-       clientSession.getSocket().getSender().pause();
-      clientEndpoint.stop();
-	    
 	}
 
 	public UDTInputStream getInputStream()throws IOException{
@@ -179,7 +159,16 @@ public class UDTClient {
 	public UDTStatistics getStatistics(){
 		return clientSession.getStatistics();
 	}
-	public UDTSession getSession(){
-        return clientSession;
-    }
+    
+	public long getSocketID()
+	{
+	    //cd 
+	    return clientSession.getSocketID();
+	}
+	
+	
+	public boolean isClose()
+	{
+	    return close;
+	}
 }

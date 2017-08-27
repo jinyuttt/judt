@@ -69,6 +69,7 @@ public class ReceiveFile extends Application{
 		format.setMaximumFractionDigits(3);
 	}
 	
+	@Override
 	public void run(){
 		configure();
 		verbose=true;

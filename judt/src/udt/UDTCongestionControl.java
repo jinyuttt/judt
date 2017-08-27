@@ -71,6 +71,7 @@ public class UDTCongestionControl implements CongestionControl {
 	/* (non-Javadoc)
 	 * @see udt.CongestionControl#init()
 	 */
+	@Override
 	public void init() {
 		
 	}
@@ -78,6 +79,7 @@ public class UDTCongestionControl implements CongestionControl {
 	/* (non-Javadoc)
 	 * @see udt.CongestionControl#setRTT(long, long)
 	 */
+	@Override
 	public void setRTT(long rtt, long rttVar){
 		this.roundTripTime=rtt;
 	}
@@ -85,6 +87,7 @@ public class UDTCongestionControl implements CongestionControl {
 	/* (non-Javadoc)
 	 * @see udt.CongestionControl#setPacketArrivalRate(long, long)
 	 */
+	@Override
 	public void updatePacketArrivalRate(long rate, long linkCapacity){
 		//see spec p. 14.
 		if(packetArrivalRate>0)packetArrivalRate=(packetArrivalRate*7+rate)/8;
@@ -93,10 +96,12 @@ public class UDTCongestionControl implements CongestionControl {
 		else estimatedLinkCapacity=linkCapacity;
 	}
 
+	@Override
 	public long getPacketArrivalRate() {
 		return packetArrivalRate;
 	}
 
+	@Override
 	public long getEstimatedLinkCapacity() {
 		return estimatedLinkCapacity;
 	}
@@ -104,13 +109,16 @@ public class UDTCongestionControl implements CongestionControl {
 	/* (non-Javadoc)
 	 * @see udt.CongestionControl#getSendInterval()
 	 */
+	@Override
 	public double getSendInterval(){
 		return packetSendingPeriod;
 	}
 
+	@Override
 	public long getAckInterval(){
 		return ackInterval;
 	}
+	@Override
 	public void setAckInterval(long ackInterval){
 		this.ackInterval=ackInterval;
 		if(session.getSocket()!=null && session.getSocket().getReceiver()!=null){
@@ -122,6 +130,7 @@ public class UDTCongestionControl implements CongestionControl {
 	 * congestionWindowSize
 	 * @return
 	 */
+	@Override
 	public double getCongestionWindowSize(){
 		return congestionWindowSize;
 	}
@@ -129,6 +138,7 @@ public class UDTCongestionControl implements CongestionControl {
 	/* (non-Javadoc)
 	 * @see udt.CongestionControl#onACK(long)
 	 */
+	@Override
 	public void onACK(long ackSeqno){
 		//increase window during slow start
 		if(slowStartPhase){
@@ -141,7 +151,7 @@ public class UDTCongestionControl implements CongestionControl {
 					packetSendingPeriod=1000000.0/packetArrivalRate;
 				}
 				else{
-					packetSendingPeriod=(double)congestionWindowSize/(roundTripTime+Util.getSYNTimeD());
+					packetSendingPeriod=congestionWindowSize/(roundTripTime+Util.getSYNTimeD());
 				}
 			}
 
@@ -196,6 +206,7 @@ public class UDTCongestionControl implements CongestionControl {
 	/* (non-Javadoc)
 	 * @see udt.CongestionControl#onNAK(java.util.List)
 	 */
+	@Override
 	public void onLoss(List<Integer>lossInfo){
 		loss=true;
 		long firstBiggestlossSeqNo=lossInfo.get(0);
@@ -246,20 +257,24 @@ public class UDTCongestionControl implements CongestionControl {
 	/* (non-Javadoc)
 	 * @see udt.CongestionControl#onTimeout()
 	 */
+	@Override
 	public void onTimeout(){}
 
 	/* (non-Javadoc)
 	 * @see udt.CongestionControl#onPacketSend(long)
 	 */
+	@Override
 	public void onPacketSend(long packetSeqNo){}
 
 	/* (non-Javadoc)
 	 * @see udt.CongestionControl#onPacketReceive(long)
 	 */
+	@Override
 	public void onPacketReceive(long packetSeqNo){}
 	/* (non-Javadoc)
 	 * @see udt.CongestionControl#close()
 	 */
+	@Override
 	public void close(){}
 
 

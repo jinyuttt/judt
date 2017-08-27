@@ -55,6 +55,7 @@ public class ServerSession extends UDTSession {
 
 	//last received packet (for testing purposes)
 	private UDTPacket lastPacket;
+    
 
 	public ServerSession(DatagramPacket dp, UDPEndPoint endPoint)throws SocketException,UnknownHostException{
 		super("ServerSession localPort="+endPoint.getLocalPort()+" peer="+dp.getAddress()+":"+dp.getPort(),new Destination(dp.getAddress(),dp.getPort()));
@@ -64,7 +65,6 @@ public class ServerSession extends UDTSession {
 
 	int n_handshake=0;
 
-
 	@Override
 	public void received(UDTPacket packet, Destination peer){
 		lastPacket=packet;
@@ -72,10 +72,10 @@ public class ServerSession extends UDTSession {
 		if(packet instanceof ConnectionHandshake) {
 			ConnectionHandshake connectionHandshake=(ConnectionHandshake)packet;
 			logger.info("Received "+connectionHandshake);
+           
 			if (getState()<=ready){
 				destination.setSocketID(connectionHandshake.getSocketID());
-                //
-				this.endPoint.Add(destination.getSocketID(), this.mySocketID);
+
 				if(getState()<=handshaking){
 					setState(handshaking);
 				}
@@ -107,31 +107,20 @@ public class ServerSession extends UDTSession {
 
 		if(getState()== ready) {
 			active = true;
-
+            
 			if (packet instanceof KeepAlive) {
 				//nothing to do here
 				return;
 			}else if (packet instanceof Shutdown) {
-//				try{
-//					socket.getReceiver().stop();
-//				}catch(IOException ex){
-//					logger.log(Level.WARNING,"",ex);
-//				}
-			    try {
-                    socket.close();
-                    logger.info("接收关闭消息,ServerSession close");
-                } catch (IOException e) {
-                    logger.log(Level.WARNING,"",e);
-                }
+				try{
+					socket.getReceiver().stop();
+				}catch(IOException ex){
+					logger.log(Level.WARNING,"",ex);
+				}
 				setState(shutdown);
 				System.out.println("SHUTDOWN ***");
 				active = false;
 				logger.info("Connection shutdown initiated by the other side.");
-//				{
-//				    //清除数据
-//				this.endPoint.ClearPeer(destination.getSocketID());
-//				this.endPoint.Remove(this.mySocketID);
-//				}
 				return;
 			}
 
@@ -140,8 +129,6 @@ public class ServerSession extends UDTSession {
 					if(packet.forSender()){
 						socket.getSender().receive(packet);
 					}else{
-					   // String info="收到客户端数据："+"源："+getDestination().getSocketID()+"socket:"+this.getSocketID();
-					    //logger.info(info);
 						socket.getReceiver().receive(packet);	
 					}
 				}catch(Exception ex){
@@ -195,20 +182,6 @@ public class ServerSession extends UDTSession {
 		logger.info("Sending reply "+responseHandshake);
 		endPoint.doSend(responseHandshake);
 	}
-
-    @Override
-    public void Dispose(Long id) {
-        // TODO Auto-generated method stub
-        endPoint.Remove(id);
-        //endPoint.ClearPeer(this.getDestination().getSocketID());
-    }
-
-    @Override
-    public void Dispose() {
-        endPoint.Remove(this.mySocketID);
-        //endPoint.ClearPeer(this.getDestination().getSocketID());
-        
-    }
 
 
 

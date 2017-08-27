@@ -62,10 +62,6 @@ public class ReceiveBuffer {
 			buffer[insert]=data;
 			numValidChunks.incrementAndGet();
 			notEmpty.signal();
-//            String info="ReceiveBuffer offer data: seqno:"+seq+"  position:"+insert+" ด๓ะกฃบ"+data.toString()
-//                    +"   initialSeq:"+initialSequenceNumber;
-//            System.out.println(info);
-//			System.out.println(data.toString());
 			return true;
 		}finally{
 			lock.unlock();

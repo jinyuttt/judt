@@ -43,6 +43,7 @@ public class StatisticsHistoryEntry {
 	/**
 	 * output as comma separated list
 	 */
+	@Override
 	public String toString(){
 		StringBuilder sb=new StringBuilder();
 		if(!isHeading){
