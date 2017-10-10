@@ -14,9 +14,9 @@ import judp.judpSocket;
  */
 public class TestServer {
 	public static void main(String[] args) {
-	  //192.168.30.128
-		judpServer  server=new judpServer("192.168.30.128",5555);
-		server.start();
+	  
+		judpServer  server=new judpServer("192.168.10.86",5555);
+		server.Start();
 		while(true)
 		{
 			judpSocket socket=server.accept();
@@ -61,7 +61,7 @@ public class TestServer {
 				}}
 			);
 			rec.setDaemon(true);
-			rec.setName(String.valueOf(socket.getID()));
+			rec.setName(String.valueOf(socket.socketID));
 			rec.start();
 					
 		}

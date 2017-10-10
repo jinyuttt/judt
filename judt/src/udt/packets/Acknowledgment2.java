@@ -62,7 +62,7 @@ public class Acknowledgment2 extends ControlPacket{
 	 
 	void decode(byte[]data){
 	}
- 
+
 	@Override
 	public boolean forSender(){
 		return false;
@@ -73,11 +73,6 @@ public class Acknowledgment2 extends ControlPacket{
 	public byte[] encodeControlInformation(){
 		return empty;
 	}
-	@Override
-	protected long getAdditionalInfo(){
-		return ackSequenceNumber;
-	}
-
 }
 
 

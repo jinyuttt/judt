@@ -186,15 +186,12 @@ public class UDTSocket {
 			packet.setSession(session);
 			packet.setDestinationID(session.getDestination().getSocketID());
 			packet.setData(chunk);
-			
 			//put the packet into the send queue
 			if(!sender.sendUdtPacket(packet, timeout, units)){
 				throw new IOException("Queue full");
 			}
-			
 		}
 		if(length>0)active=true;
-		
 	}
 	/**
 	 * will block until the outstanding packets have really been sent out

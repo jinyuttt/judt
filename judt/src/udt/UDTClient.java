@@ -50,8 +50,7 @@ public class UDTClient {
 	private final UDPEndPoint clientEndpoint;
 	private ClientSession clientSession;
 	private boolean close=false;
-    private Thread closeThread=null;//cd
-    private final int waitClose=10*1000;
+
 	public UDTClient(InetAddress address, int localport)throws SocketException, UnknownHostException{
 		//create endpoint
 		clientEndpoint=new UDPEndPoint(address,localport);
@@ -100,18 +99,10 @@ public class UDTClient {
 	 * @throws InterruptedException
 	 */
 	public void send(byte[]data)throws IOException, InterruptedException{
-		if(close)
-		{
-			return;//cd
-		}
 		clientSession.getSocket().doWrite(data);
 	}
 
 	public void sendBlocking(byte[]data)throws IOException, InterruptedException{
-		if(close)
-		{
-			return;//cd
-		}
 		clientSession.getSocket().doWriteBlocking(data);
 	}
 
@@ -175,70 +166,6 @@ public class UDTClient {
 	    return clientSession.getSocketID();
 	}
 	
-	/**
-	 * 同步关闭
-	 * 等待数据发送完成后再关闭
-	 * 但是只等待10ss
-	 */
-	public synchronized void close()
-	{
-		close=true;
-		if(closeThread==null)
-		{
-			closeThread=new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					int num=0;
-				while(true)
-				{
-					if(clientSession.getSocket().getSender().isSenderEmpty())
-					{
-						try {
-							shutdown();
-							break;
-						} catch (IOException e) {
-						
-							e.printStackTrace();
-						}
-					}
-					else
-					{
-						try {
-							TimeUnit.MILLISECONDS.sleep(100);
-							num++;
-							if(waitClose<=num*100)
-							{
-								try {
-									shutdown();
-								} catch (IOException e) {
-								
-									e.printStackTrace();
-								}
-								break;
-							}
-						} catch (InterruptedException e) {
-							
-							e.printStackTrace();
-						}
-					}
-				}
-					
-				}
-				
-			});
-			closeThread.setDaemon(true);
-			closeThread.setName("closeThread");
-		}
-		if(closeThread.isAlive())
-		{
-			return;
-		}
-		else
-		{
-			closeThread.start();
-		}
-	}
 	
 	public boolean isClose()
 	{

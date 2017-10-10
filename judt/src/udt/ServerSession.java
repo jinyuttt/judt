@@ -75,6 +75,7 @@ public class ServerSession extends UDTSession {
            
 			if (getState()<=ready){
 				destination.setSocketID(connectionHandshake.getSocketID());
+
 				if(getState()<=handshaking){
 					setState(handshaking);
 				}
@@ -125,7 +126,6 @@ public class ServerSession extends UDTSession {
 
 			else{
 				try{
-				
 					if(packet.forSender()){
 						socket.getSender().receive(packet);
 					}else{

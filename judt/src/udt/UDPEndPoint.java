@@ -210,13 +210,6 @@ public class UDPEndPoint {
 	public UDTSession getSession(Long destinationID){
 		return sessions.get(destinationID);
 	}
-	
-	/**
-	 * 移除session
-	 * cd
-	 * @param socketid
-	 * @return
-	 */
     public UDTSession removeSession(long socketid)
     {
     	//cd
@@ -292,7 +285,7 @@ public class UDPEndPoint {
 								}
 							}
 							peer.setSocketID(((ConnectionHandshake)packet).getSocketID());
-						    session.received(packet,peer);
+							session.received(packet,peer);
 						}
 					}
 					else{
@@ -303,7 +296,7 @@ public class UDPEndPoint {
 							session=lastSession;
 						}
 						else{
-							session=sessions.get(dest);//cd
+							session=sessions.get(dest);
 							lastSession=session;
 							lastDestID=dest;
 						}
@@ -315,19 +308,10 @@ public class UDPEndPoint {
 						}
 						else{
 							session.received(packet,peer);
-							
 						}
 					}
 				}catch(SocketException ex){
-					if(ex.getMessage().equals("socket closed")&&stopped)
-					{
-						//cd
-						//已经正常关闭
-					}
-					else
-					{
-					   logger.log(Level.INFO, "SocketException: "+ex.getMessage());
-					}
+					logger.log(Level.INFO, "SocketException: "+ex.getMessage());
 				}catch(SocketTimeoutException ste){
 					//can safely ignore... we will retry until the endpoint is stopped
 				}

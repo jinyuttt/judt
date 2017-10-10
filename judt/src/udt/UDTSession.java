@@ -210,7 +210,7 @@ public abstract class UDTSession {
 	
 	public synchronized long getInitialSequenceNumber(){
 		if(initialSequenceNumber==null){
-			initialSequenceNumber=1l;
+			initialSequenceNumber=1l; //TODO must be random?
 		}
 		return initialSequenceNumber;
 	}

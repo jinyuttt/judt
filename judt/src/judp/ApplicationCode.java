@@ -79,7 +79,7 @@ public class ApplicationCode {
            waitTime=(long)(speed*1000);
            
        }
-       System.out.println("sendFile_"+file.getName()+",socketID:"+target.getID());
+       System.out.println("sendFile_"+file.getName()+",socketID:"+target.socketID);
         while(true){
             try {
                 c=fis.read(buf);

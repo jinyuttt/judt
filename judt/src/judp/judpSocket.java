@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import udt.UDTSession;
 import udt.UDTSocket;
 import udt.packets.Destination;
@@ -15,27 +16,21 @@ import udt.packets.Destination;
  * @author jinyu
  *
  *服务端返回的网络接口对象
- *保存socket并检查有数据的对象
  */
 public class judpSocket {
-private   int bufSize=65535;
+private  final int bufSize=1500;
 private UDTSocket socket=null;
+private long start=System.currentTimeMillis();
 private boolean isClose=false;
+private long flushTime=0;
+private final long waitDataLen=30*1000;//30秒
+private long  readLen=0;//读取数据
 private long sendLen=0;//发送数据
-private long socketID=0;//ID
-private Thread closeThread;
-private final int waitClose=10*1000;
-private PackagetCombin pack=new PackagetCombin();
-//private int readLen=0;
-public int dataLen=0;
-public void setRecBufferSize(int size)
-{
-	bufSize=size;
-}
+public long socketID=0;//ID
+private static final Logger logger=Logger.getLogger(judpSocket.class.getName());
 public boolean getCloseState()
 {
-	//底层已经关闭
-	return isClose|socket.isClose();
+	return isClose;
 }
 public judpSocket(UDTSocket  usocket)
 {
@@ -44,17 +39,7 @@ public judpSocket(UDTSocket  usocket)
 }
 
 /**
- * 获取ID
- * @return
- */
-public long getSocketID()
-{
-	return socketID;
-}
-
-/**
  * 关闭
- * 等待数据完成关闭
  */
 public void close()
 {
@@ -62,84 +47,29 @@ public void close()
 	//不能真实关闭
 	if(sendLen==0)
 	{
-		stop();
+		//没有发送则可以直接关闭，不需要等待数据发送完成
+		 try {
+			socket.close();
+			UDTSession serversession=socket.getEndpoint().removeSession(socketID);
+			if(serversession!=null)
+			{
+				serversession.getSocket().close();
+			     socket.getReceiver().stop();
+			     socket.getSender().stop();
+				System.out.println("物理关闭socket:"+serversession.getSocketID());
+			}
+			
+			serversession=null;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		 System.out.println("物理关闭socket");
 	}
 	else
 	{
 		//有过发送数据则缓冲
-		//SocketManager.getInstance().add(socket);
-	
-		if(closeThread==null)
-		{
-			closeThread=new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					int num=0;
-				while(true)
-				{
-					if(socket.getSender().isSenderEmpty())
-					{
-						stop();
-						break;
-					}
-					else
-					{
-						try {
-							TimeUnit.MILLISECONDS.sleep(100);
-							num++;
-							if(waitClose<=num*100)
-							{
-								stop();
-								break;
-							}
-						} catch (InterruptedException e) {
-							
-							e.printStackTrace();
-						}
-					}
-				}
-					
-				}
-				
-			});
-			closeThread.setDaemon(true);
-			closeThread.setName("closeThread");
-		}
-		if(closeThread.isAlive())
-		{
-			return;
-		}
-		else
-		{
-			closeThread.start();
-		}
+		SocketManager.getInstance().add(socket);
 	}
-}
-
-/**
- * 立即关闭
- */
-public void stop()
-{
-	//没有发送则可以直接关闭，不需要等待数据发送完成
-	 try {
-		socket.close();
-		UDTSession serversession=socket.getEndpoint().removeSession(socketID);
-		if(serversession!=null)
-		{
-			serversession.getSocket().close();
-		     socket.getReceiver().stop();
-		     socket.getSender().stop();
-			System.out.println("物理关闭socket:"+serversession.getSocketID());
-		}
-		
-		serversession=null;
-	} catch (IOException e) {
-		e.printStackTrace();
-	}
-	 System.out.println("物理关闭socket");
 }
 
 /**
@@ -148,13 +78,20 @@ public void stop()
  */
 public int readData(byte[]data)
 {
-    if(getCloseState())
+    if(isClose)
      {
 	   return -1;
      }
 	try {
 	  int r=socket.getInputStream().read(data);
-	  //readLen+=r;
+	  readLen+=r;
+	  flushTime=System.currentTimeMillis();
+	  if(flushTime-start>waitDataLen&&readLen==0)
+		{
+	      //等待时间长度，没有发送过接收过数据，则退出
+	       logger.info("缓冲时间到退出读取:"+socketID);
+		   return -1;
+		}
 	 return r;
 	} catch (IOException e) {
 		e.printStackTrace();
@@ -165,56 +102,83 @@ public int readData(byte[]data)
 /**
  * 读取全部数据
  */
-public byte[] readALL()
+public byte[] readData()
 {
 	 byte[] result=null;
 	  if(socket!=null)
 	  {
 		  byte[]  readBytes=new byte[bufSize];//接收区
+		  byte[] buf=new byte[bufSize];//数据区
+		  int index=0;
 		  int r=0;
-		  while(true)
-		  {
-			  if(getCloseState())
-				{
-					return null;
-				}
-		       r=readData(readBytes);
-		      if(r==-1)
-		      {
-		    	  result=pack.getData();
-		    	  break;
-		      }
-		      else
-		      {
-		         // readLen+=r;
-		    	  if(r==0)
-		    	  {
-		    		  try {
-						TimeUnit.MILLISECONDS.sleep(100);
-						
-						continue;
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+		  try {
+			  while(true)
+			  {
+				  if(isClose)
+					{
+						return null;
 					}
-		    	  }
-		    	 //
-		    		  byte[] buf=new byte[r];
-		    		  System.arraycopy(readBytes, 0, buf, 0, r);
-		    		  if(pack.addData(buf))
-		    		  {
-		    			  result=pack.getData();
-		    			  break;
-		    		  }
-		    	 
-		    	  
-		      }
-		  } 
+		          r=socket.getInputStream().read(readBytes);
+		          if(r==-1)
+		          {
+		        	  break;
+		          }
+		          else
+		          {
+		              readLen+=r;
+		        	  if(r==0)
+		        	  {
+		        		  try {
+							TimeUnit.MILLISECONDS.sleep(100);
+							flushTime=System.currentTimeMillis();
+							if(flushTime-start>waitDataLen&&readLen==0)
+							{
+							    //没有使用过数据
+								break;
+							}
+							continue;
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+		        	  }
+		        	  if(r<=bufSize)
+		        	  {
+		        		  //result=new byte[r];
+		        		  //System.arraycopy(readBytes, 0, result, 0, r);
+		        		  if(index+r<buf.length)
+		        		  {
+		        			  System.arraycopy(readBytes, 0, buf, index, r);
+		        			  index+=r;
+		        		  }
+		        		  else
+		        		  {
+		        			  //扩展数据区
+		        			  int len=(int) (buf.length*0.75);
+		        			  if(len<bufSize)
+		        			  {
+		        				  len=bufSize;
+		        			  }
+		        			  //最小扩展bufSize；一定比r大
+		        			  byte[] tmp=new byte[buf.length+len];
+		        			  System.arraycopy(buf, 0, tmp, 0, index+1);//拷贝数据
+		        			  System.arraycopy(readBytes, 0, tmp, index, r);//拷贝数据
+		        			  buf=tmp;
+		        			  index+=r;
+		        		  }
+		        	  }
+		          }
+			  }
+		     
+		} catch (IOException e) {
 		
+			e.printStackTrace();
+		} 
+		  result=new byte[index+1];//长度
+		  System.arraycopy(buf, 0, result, 0,index+1);//拷贝数据
 	  }
 	  
 	  return result;
 }
-
 
 /*
  * 获取初始化序列
@@ -236,10 +200,7 @@ public int getDataStreamLen()
     return socket.getSession().getDatagramSize();
 }
 
-/**
- * 目的socket
- * @return
- */
+
 public Destination getDestination()
 {
 
@@ -261,109 +222,19 @@ public Destination getDestination()
  * 空数据不能发送
  */
 public boolean sendData(byte[]data) {
-	if(getCloseState())
+	if(isClose)
 	{
 		return false;
 	}
 	try {
-		
 		socket.getOutputStream().write(data);
-		socket.getOutputStream().flush();
 		sendLen=+1;
+		flushTime=System.currentTimeMillis();
 		return true;
 	} catch (IOException e) {
 		e.printStackTrace();
 	}
 	return false;
-}
-
-/**
- * 分包发送数据
- * 会再次分割数据，同时添加头
- * 对应的要用readALL
- * @param data
- * @return
- */
-public boolean sendSplitData(byte[]data) {
-	if(getCloseState())
-	{
-		return false;
-	}
-	 byte[][]result=null;
-	 if(dataLen==0)
-	 {
-		 result= PackagetSub.splitData(data);
-	 }
-	 else
-	 {
-		 PackagetSub sub=new PackagetSub();
-		 result=sub.split(data, dataLen);
-	 }
-	 for(int i=0;i<result.length;i++)
-	 {
-		 if(!sendData(result[i]))
-		 {
-			 //一次发送失败则返回失败
-			 return false;
-		 }
-	 }
-	return true;
-}
-/**
- * 获取远端host
- * @return
- */
-public String getRemoteHost() {
-return	socket.getSession().getDestination().getAddress().getHostName();
-	
-}
-
-/**
- * 获取远端端口
- * @return
- */
-public int getRemotePort() {
-  return	socket.getSession().getDestination().getPort();
-}
-
-/**
- * socketid
- * @return
- */
-public long getID() {
-	
-	return socketID;
-}
-/**
- * 设置是读取为主还是写入为主
- * 如果是写入为主，当读取速度慢时，数据覆盖丢失
- * 默认读取为主，还没有读取则不允许覆盖，丢掉数据，等待重复
- * 设置大数据读取才有意义
- * @param isRead
- */
-public void  setBufferRW(boolean isRead)
-{
-	try {
-		socket.getInputStream().resetBufMaster(isRead);
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-}
-
-/**
- * 设置大数据读取
- * 默认 false
- * @param islarge
- */
-public void setLargeRead(boolean islarge)
-{
-	try {
-		socket.getInputStream().setLargeRead(islarge);
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
 }
 
 

@@ -51,7 +51,7 @@ public class ClientSession extends UDTSession {
 	private static final Logger logger=Logger.getLogger(ClientSession.class.getName());
 
 	private UDPEndPoint endPoint;
-    public volatile int connectNum=0;//cd
+
 	public ClientSession(UDPEndPoint endPoint, Destination dest)throws SocketException{
 		super("ClientSession localPort="+endPoint.getLocalPort(),dest);
 		this.endPoint=endPoint;
@@ -109,10 +109,9 @@ public class ClientSession extends UDTSession {
 						long peerSocketID=hs.getSocketID();
 						destination.setSocketID(peerSocketID);
 						setState(ready);
-						Thread.sleep(50);
 						this.setInitialSequenceNumber(hs.getInitialSeqNo());//cd 必须重置
-						System.out.println("初始序列置回2:"+this.getInitialSequenceNumber());
 						socket=new UDTSocket(endPoint,this);
+						
 						
 					}catch(Exception ex){
 						logger.log(Level.WARNING,"Error creating socket",ex);
@@ -162,7 +161,6 @@ public class ClientSession extends UDTSession {
 		handshake.setSession(this);
 		logger.info("Sending "+handshake);
 		endPoint.doSend(handshake);
-		connectNum++;
 	}
 
 	//2nd handshake for connect
