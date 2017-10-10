@@ -1,0 +1,15 @@
+/**
+ * 
+ */
+package judp;
+
+/**
+ * @author jinyu
+ *
+ */
+public class PackagetCombin {
+public static void addData(byte[] data)
+{
+	
+}
+}

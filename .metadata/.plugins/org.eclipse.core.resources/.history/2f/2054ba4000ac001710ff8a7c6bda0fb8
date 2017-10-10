@@ -1,0 +1,14 @@
+/**
+ * 
+ */
+package judp;
+
+import java.lang.ref.ReferenceQueue;
+
+/**
+ * @author jinyu
+ *
+ */
+public class SocketQueue extends ReferenceQueue<T> {
+
+}
