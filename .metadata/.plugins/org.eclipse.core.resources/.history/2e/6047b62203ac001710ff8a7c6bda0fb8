@@ -1,0 +1,22 @@
+/**
+ * 
+ */
+package judp;
+
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
+
+/**
+ * @author jinyu
+ * @param <T>
+ *
+ */
+public class SocketReference<T> extends WeakReference<T> {
+ public SocketQueue(T referent) {
+		super(referent);
+		
+	}
+
+
+ public 
+}

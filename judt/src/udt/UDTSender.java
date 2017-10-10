@@ -117,6 +117,10 @@ public class UDTSender {
 	private final AtomicReference<CountDownLatch> waitForSeqAckLatch=new AtomicReference<CountDownLatch>();
 
 	private final boolean storeStatistics;
+	
+	// cd
+	private volatile int bufferNum=0;
+	private	volatile boolean isModify=true;
 
 	public UDTSender(UDTSession session,UDPEndPoint endpoint){
 		if(!session.isReady())throw new IllegalStateException("UDTSession is not ready.");
@@ -246,7 +250,31 @@ public class UDTSender {
 	protected void onAcknowledge(Acknowledgement acknowledgement)throws IOException{
 		waitForAckLatch.get().countDown();
 		waitForSeqAckLatch.get().countDown();
-
+		//cd 
+		long ackNumber=acknowledgement.getAckNumber();
+		// cd
+				if(this.session instanceof ClientSession)
+				{
+					//cd 
+				  if(this.isModify)
+				  {
+					//已经发送过10000包，不用再修正，认为接收方已经关闭
+				   if(bufferNum<10000)
+				   {
+				    if(ackNumber/100000!=this.session.getInitialSequenceNumber()/100000)
+				    {
+				    	//认为不同段的seqNo,则不是通信的接收方session
+						 statistics.incNumberOfACKReceived();
+						 if(storeStatistics)statistics.storeParameters();
+					     return;
+				    }
+				   }
+				   else
+				   {
+					   this.isModify=false;//不用再修正
+				   }
+				  }
+				}
 		CongestionControl cc=session.getCongestionControl();
 		long rtt=acknowledgement.getRoundTripTime();
 		if(rtt>0){
@@ -261,8 +289,9 @@ public class UDTSender {
 			statistics.setPacketArrivalRate(cc.getPacketArrivalRate(), cc.getEstimatedLinkCapacity());
 		}
 
-		long ackNumber=acknowledgement.getAckNumber();
+		
 		cc.onACK(ackNumber);
+		
 		statistics.setCongestionWindowSize((long)cc.getCongestionWindowSize());
 		//need to remove all sequence numbers up the ack number from the sendBuffer
 		boolean removed=false;
@@ -272,11 +301,15 @@ public class UDTSender {
 			}
 			if(removed){
 				unacknowledged.decrementAndGet();
+				bufferNum++;//cd
 			}
 		}
-		lastAckSequenceNumber=Math.max(lastAckSequenceNumber, ackNumber);		
+		
+		lastAckSequenceNumber=Math.max(lastAckSequenceNumber, ackNumber);
+		
 		//send ACK2 packet to the receiver
 		sendAck2(ackNumber);
+		//
 		statistics.incNumberOfACKReceived();
 		if(storeStatistics)statistics.storeParameters();
 	}
@@ -328,6 +361,7 @@ public class UDTSender {
 			if (!senderLossList.isEmpty()) {
 				Long entry=senderLossList.getFirstEntry();
 				handleResubmit(entry);
+				logger.info("senderLossList:"+entry);
 			}
 
 			else
@@ -469,5 +503,22 @@ public class UDTSender {
 	public void pause(){
 		startLatch=new CountDownLatch(1);
 		paused=true;
+	}
+	
+	/**
+	 * 发送的数据清空
+	 * cd
+	 * @return
+	 */
+	public boolean isSenderEmpty()
+	{
+		if(senderLossList.isEmpty()&&sendBuffer.isEmpty()&&sendQueue.isEmpty())
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

@@ -1,0 +1,35 @@
+/**
+ * 
+ */
+package Test;
+
+import java.io.IOException;
+import java.util.logging.Logger;
+
+import net.File.RecviceFiles;
+
+
+/**
+ * @author jinyu
+ *
+ */
+public class TestRecFile {
+	private static  Logger log=Logger.getLogger(TestRecFile.class.getName());
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		RecviceFiles rec=new RecviceFiles();
+            String dir="F://dbfile";
+			rec.setDir(dir);
+			rec.start("127.0.0.1", 5555);
+			log.info("启动接收文件");
+			try {
+				System.in.read();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+
+}

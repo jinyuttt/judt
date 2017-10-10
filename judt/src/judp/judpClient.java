@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 import udt.UDTClient;
 
@@ -16,8 +17,10 @@ import udt.UDTClient;
  */
 public class judpClient {
   private	UDTClient client=null;
-  private  final int bufSize=1500;
+  private  final int bufSize=65535;
   private  long sumLen=0;
+  private PackagetCombin pack=new PackagetCombin();
+  public int dataLen=0;
   public judpClient(String lcoalIP,int port)
   {
 	  InetAddress addr = null;
@@ -36,7 +39,7 @@ public class judpClient {
 	
 		e.printStackTrace();
 	}
-	  SocketManager.getInstance().addGC(this,client);
+	 
   }
   public judpClient()
   {
@@ -47,7 +50,7 @@ public class judpClient {
 	} catch (UnknownHostException e) {
 		e.printStackTrace();
 	}
-	  SocketManager.getInstance().addGC(this,client);
+	  
   }
   public judpClient(int port)
   {
@@ -58,7 +61,7 @@ public class judpClient {
 	} catch (UnknownHostException e) {
 		e.printStackTrace();
 	}
-	  SocketManager.getInstance().addGC(this,client);
+	 
   }
   public boolean connect(String ip,int port)
   {
@@ -90,9 +93,11 @@ public class judpClient {
 	  if(client!=null)
 	  {
 		  try {
+			 
 			client.sendBlocking(data);
 			r=data.length;
 		    sumLen+=r;
+		    
 		} catch (IOException e) {
 			
 			e.printStackTrace();
@@ -101,6 +106,30 @@ public class judpClient {
 		}
 	  }
 	  return r;
+  }
+  public int sendSplitData(byte[] data)
+  {
+	  if(data==null)
+	  {
+		  return 0;
+	  }
+	  int r=0;
+	   byte[][]sendData=null;
+	    if(dataLen==0)
+	    {
+	    	sendData=PackagetSub.splitData(data);
+	    }
+	    else
+	    {
+	    	PackagetSub sub=new PackagetSub();
+	    	sendData=sub.split(data, dataLen);
+	    }
+	    for(int i=0;i<sendData.length;i++)
+	    {
+		   r+=sendData(sendData[i]);
+	    }
+	return r;
+	
   }
   public void pauseOutput()
   {
@@ -111,62 +140,63 @@ public class judpClient {
         e.printStackTrace();
     }
   }
-  public byte[]  read()
+  
+  /**
+   * 读取数据
+   * 只和split发送对应
+   * @return
+   */
+  public byte[]  readALL()
   {
 	  byte[] result=null;
 	  if(client!=null)
 	  {
 		  byte[]  readBytes=new byte[bufSize];//接收区
-		  byte[] buf=new byte[bufSize];//数据区
-		  int index=0;
 		  int r=0;
 		  try {
 			  while(true)
 			  {
-		           r=client.read(readBytes);
+				  if(client.isClose())
+					{
+						return null;
+					}
+		          r=client.getInputStream().read(readBytes);
 		          if(r==-1)
 		          {
+		        	  result=pack.getData();
 		        	  break;
 		          }
 		          else
 		          {
-		        	  if(r<=bufSize)
+		             
+		        	  if(r==0)
 		        	  {
-		        		  //result=new byte[r];
-		        		  //System.arraycopy(readBytes, 0, result, 0, r);
-		        		  if(index+r<buf.length)
-		        		  {
-		        			  System.arraycopy(readBytes, 0, buf, index, r);
-		        			  index+=r;
-		        		  }
-		        		  else
-		        		  {
-		        			  //扩展数据区
-		        			  int len=(int) (buf.length*0.75);
-		        			  if(len<bufSize)
-		        			  {
-		        				  len=bufSize;
-		        			  }
-		        			  //最小扩展bufSize；一定比r大
-		        			  byte[] tmp=new byte[buf.length+len];
-		        			  System.arraycopy(buf, 0, tmp, 0, index+1);//拷贝数据
-		        			  System.arraycopy(readBytes, 0, tmp, index, r);//拷贝数据
-		        			  buf=tmp;
-		        			  index+=r;
-		        		  }
+		        		  try {
+							TimeUnit.MILLISECONDS.sleep(100);
+							
+							continue;
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 		        	  }
+		        	 //
+		        		  byte[] buf=new byte[r];
+		        		  System.arraycopy(readBytes, 0, buf, 0, r);
+		        		  if(pack.addData(buf))
+		        		  {
+		        			  result=pack.getData();
+		        			  break;
+		        		  }
+		        	 
+		        	  
 		          }
 			  }
 		     
 		} catch (IOException e) {
 		
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			
-			e.printStackTrace();
-		}
-		  result=new byte[index+1];//长度
-		  System.arraycopy(buf, 0, result, 0,index+1);//拷贝数据
+		} 
+		
 	  }
 	  
 	  return result;
@@ -182,6 +212,10 @@ public class judpClient {
 	}
 	return -1;
   }
+  
+  /**
+   * 关闭
+   */
   public void close()
   {
 	  if(client!=null)
@@ -189,20 +223,62 @@ public class judpClient {
 		  if(sumLen==0)
 		  {
 			  //没有发送数据
+			  //立即关闭
 			  try {
 			      if(!client.isClose())
-				client.shutdown();
+				    client.shutdown();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		  }
 		  else
 		  {
 			  //开始缓存
-			  SocketManager.getInstance().add(client);
+			  //SocketManager.getInstance().add(client);
+			  if(!client.isClose())
+					client.close();
 		  }
 	  }
   }
+  
+  /**
+   * 是否关闭
+   * @return
+   */
+ public boolean isClose()
+ {
+	 return client.isClose();
+ }
+ /**
+  * 设置是读取为主还是写入为主
+  * 如果是写入为主，当读取速度慢时，数据覆盖丢失
+  * 默认读取为主，还没有读取则不允许覆盖，丢掉数据，等待重复
+  * islagerRead=true才有意义
+  * @param isRead
+  */
+ public void  resetBufMaster(boolean isRead)
+ {
+	 try {
+		client.getInputStream().resetBufMaster(isRead);
+	} catch (IOException e) {
+		
+		e.printStackTrace();
+	}
+ }
  
+ /**
+  * 设置大数据读取
+  * 默认 false
+  * @param islarge
+  */
+ public void setLargeRead(boolean islarge)
+ {
+	 try {
+		client.getInputStream().setLargeRead(islarge);
+	} catch (IOException e) {
+		
+		e.printStackTrace();
+	}
+ }
 }

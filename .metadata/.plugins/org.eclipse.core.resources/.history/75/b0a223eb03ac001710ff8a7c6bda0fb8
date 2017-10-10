@@ -1,0 +1,70 @@
+/**
+ * 
+ */
+package judp;
+
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
+
+import udt.UDPEndPoint;
+import udt.UDTClient;
+
+/**
+ * @author jinyu
+ * 管理接受端的judpSocket
+ */
+public class judpSocketManager {
+	private static final Logger logger=Logger.getLogger(SocketManager.class.getName());
+	private LinkedBlockingQueue<SocketReference<judpSocket>> queue=new LinkedBlockingQueue<SocketReference<judpSocket>>();
+	private final ReferenceQueue q = new ReferenceQueue();
+	private  UDPEndPoint endPoint=null;
+	private static judpSocketManager instance=null;
+	  private judpSocketManager (UDPEndPoint point){
+		  startThread();
+		  startGC();
+		  this.endPoint=point;
+		 
+	  }
+	   private void startGC() {
+		   Thread clearSession=new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					while(true)
+					{
+						
+						SocketReference<judpSocket k;
+					        while((k = (WeakReference) q.remove()) != null) {
+					           
+					        }
+					}
+					
+				}
+				
+			});
+			clearSession.setDaemon(true);
+			clearSession.setName("clearSession");
+			clearSession.start();
+		
+	}
+	private void startThread() {
+	
+		
+	}
+	public static synchronized judpSocketManager getInstance(UDPEndPoint point) {  
+		   
+	  if (instance == null) {  
+		
+	     instance = new judpSocketManager(point);    
+	     
+ }  
+	  return instance;  
+ }
+	public void addSocket(judpSocket socket)
+	{
+		queue.add(socket);
+	}
+}

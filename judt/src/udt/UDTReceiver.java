@@ -155,6 +155,8 @@ public class UDTReceiver {
 
 	private final boolean storeStatistics;
 	
+	
+	
 	/**
 	 * create a receiver with a valid {@link UDTSession}
 	 * @param session
@@ -242,6 +244,7 @@ public class UDTReceiver {
 		if(nextNAK<currentTime){
 			nextNAK=currentTime+nakTimerInterval;
 			processNAKEvent();
+			
 		}
 
 		//check EXP timer
@@ -365,6 +368,7 @@ public class UDTReceiver {
 				dataProcessTime.end();
 				dataPacketInterval.begin();
 			}
+			
 		}
 
 		else if (p.getControlPacketType()==ControlPacketType.ACK2.ordinal()){
@@ -397,6 +401,7 @@ public class UDTReceiver {
 //		//}
 		boolean OK=session.getSocket().getInputStream().haveNewData(currentSequenceNumber,dp.getData());
 		if(!OK){
+		
 			//need to drop packet...
 			return;
 		}
@@ -417,7 +422,7 @@ public class UDTReceiver {
 		
 		//store current time
 		lastDataPacketArrivalTime=currentDataPacketArrivalTime;
-
+		
 		
 		//(6).number of detected lossed packet
 		/*(6.a).if the number of the current data packet is greater than LSRN+1,
@@ -425,14 +430,16 @@ public class UDTReceiver {
 			into the receiver's loss list and send them to the sender in an NAK packet*/
 		if(SequenceNumber.compare(currentSequenceNumber,largestReceivedSeqNumber+1)>0){
 			sendNAK(currentSequenceNumber);
+			
 		}
 		else if(SequenceNumber.compare(currentSequenceNumber,largestReceivedSeqNumber)<0){
 				/*(6.b).if the sequence number is less than LRSN,remove it from
 				 * the receiver's loss list
 				 */
 				receiverLossList.remove(currentSequenceNumber);
+				
 		}
-
+		
 		statistics.incNumberOfReceivedDataPackets();
 
 		//(7).Update the LRSN
@@ -476,6 +483,7 @@ public class UDTReceiver {
 		nAckPacket.setDestinationID(session.getDestination().getSocketID());
 		endpoint.doSend(nAckPacket);
 		statistics.incNumberOfNAKSent();
+		
 	}
 
 	protected long sendLightAcknowledgment(long ackNumber)throws IOException{
@@ -535,7 +543,6 @@ public class UDTReceiver {
 		if(entry!=null){
 			long ackNumber=entry.getAckNumber();
 			largestAcknowledgedAckNumber=Math.max(ackNumber, largestAcknowledgedAckNumber);
-			
 			long rtt=entry.getAge();
 			if(roundTripTime>0)roundTripTime = (roundTripTime*7 + rtt)/8;
 			else roundTripTime = rtt;

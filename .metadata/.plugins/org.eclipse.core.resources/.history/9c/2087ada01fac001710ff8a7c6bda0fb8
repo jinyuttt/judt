@@ -1,0 +1,35 @@
+/**
+ * 
+ */
+package judp;
+
+import java.nio.ByteBuffer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+/**
+ * @author jinyu
+ *
+ */
+public class PackagetCombin {
+	private  static  ConcurrentHashMap<Long,DataStruct> hash=new  ConcurrentHashMap<Long,DataStruct>();
+	private  ConcurrentLinkedQueue<byte[]> queue=new  ConcurrentLinkedQueue<byte[]>();
+public  boolean addData(byte[] data)
+{
+	ByteBuffer buf=ByteBuffer.wrap(data);
+	long id=buf.getLong();
+	int num=buf.getInt();
+	DataStruct struct=hash.get(id);
+	if(struct==null)
+	{
+		struct=new DataStruct(num);
+		hash.put(id, struct);
+	}
+    boolean r=	struct.addData(data);
+    if(r)
+    {
+    	queue.offer(struct.getData());
+    }
+	return r;
+	 
+}
+}

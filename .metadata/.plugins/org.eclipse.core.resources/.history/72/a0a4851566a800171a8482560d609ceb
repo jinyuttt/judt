@@ -1,0 +1,38 @@
+/**
+ * 
+ */
+package judp;
+
+import java.util.ArrayList;
+
+import udt.UDTSocket;
+
+/**
+ * @author jinyu
+ * 按照目的分组
+ */
+public class judpGroupSocket {
+private ArrayList<UDTSocket> list=new ArrayList<UDTSocket>();
+public judpGroupSocket()
+{
+	
+}
+
+/**
+ * 添加socket
+ * @param socket
+ */
+public void addSocket(UDTSocket socket)
+{
+	list.add(socket);
+}
+
+/**
+ * 获取数据socket
+ * @return
+ */
+public judpGroupSocket getSocket()
+{
+	
+}
+}

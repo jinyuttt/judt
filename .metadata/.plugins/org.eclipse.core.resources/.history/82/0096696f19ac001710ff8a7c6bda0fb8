@@ -1,0 +1,14 @@
+/**
+ * 
+ */
+package judp;
+import java.util.concurrent.atomic.AtomicLong;
+/**
+ * @author jinyu
+ *
+ */
+public class PackagetSub {
+ private static AtomicLong subid=new AtomicLong(0);
+ public static int  dataSzie=1472;
+ public byte[][] split(byte[]data)
+}

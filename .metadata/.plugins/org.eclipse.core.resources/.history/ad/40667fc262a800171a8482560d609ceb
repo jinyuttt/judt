@@ -1,0 +1,16 @@
+/**
+ * 
+ */
+package judp;
+
+/**
+ * @author jinyu
+ *
+ */
+public class judpGroupSocket {
+	
+public judpGroupSocket()
+{
+	
+}
+}

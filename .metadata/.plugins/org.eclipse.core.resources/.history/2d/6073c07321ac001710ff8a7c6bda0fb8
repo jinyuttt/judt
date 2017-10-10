@@ -1,0 +1,297 @@
+/**
+ * 
+ */
+package judp;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
+import udt.UDTSession;
+import udt.UDTSocket;
+import udt.packets.Destination;
+
+/**
+ * @author jinyu
+ *
+ *服务端返回的网络接口对象
+ *保存socket并检查有数据的对象
+ */
+public class judpSocket {
+private  final int bufSize=65535;
+private UDTSocket socket=null;
+private long start=System.currentTimeMillis();
+private boolean isClose=false;
+private long  readLen=0;//读取数据
+private long sendLen=0;//发送数据
+private long socketID=0;//ID
+private Thread closeThread;
+private final int waitClose=10*1000;
+private static final Logger logger=Logger.getLogger(judpSocket.class.getName());
+private PackagetCombin pack=new PackagetCombin();
+public boolean getCloseState()
+{
+	return isClose;
+}
+public judpSocket(UDTSocket  usocket)
+{
+	this.socket=usocket;
+	socketID=socket.getSession().getSocketID();
+}
+
+/**
+ * 获取ID
+ * @return
+ */
+public long getSocketID()
+{
+	return socketID;
+}
+
+/**
+ * 关闭
+ * 等待数据完成关闭
+ */
+public void close()
+{
+	isClose=true;
+	//不能真实关闭
+	if(sendLen==0)
+	{
+		stop();
+		 System.out.println("物理关闭socket");
+	}
+	else
+	{
+		//有过发送数据则缓冲
+		//SocketManager.getInstance().add(socket);
+	
+		if(closeThread==null)
+		{
+			closeThread=new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					int num=0;
+				while(true)
+				{
+					if(socket.getSender().isSenderEmpty())
+					{
+						stop();
+					}
+					else
+					{
+						try {
+							TimeUnit.MILLISECONDS.sleep(100);
+							num++;
+							if(waitClose<=num*100)
+							{
+								stop();
+								break;
+							}
+						} catch (InterruptedException e) {
+							
+							e.printStackTrace();
+						}
+					}
+				}
+					
+				}
+				
+			});
+			closeThread.setDaemon(true);
+			closeThread.setName("closeThread");
+		}
+		if(closeThread.isAlive())
+		{
+			return;
+		}
+		else
+		{
+			closeThread.start();
+		}
+	}
+}
+
+/**
+ * 立即关闭
+ */
+public void stop()
+{
+	//没有发送则可以直接关闭，不需要等待数据发送完成
+	 try {
+		socket.close();
+		UDTSession serversession=socket.getEndpoint().removeSession(socketID);
+		if(serversession!=null)
+		{
+			serversession.getSocket().close();
+		     socket.getReceiver().stop();
+		     socket.getSender().stop();
+			System.out.println("物理关闭socket:"+serversession.getSocketID());
+		}
+		
+		serversession=null;
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+	 System.out.println("物理关闭socket");
+}
+
+/**
+ * 读取数据
+ * 返回接收的字节大小
+ */
+public int readData(byte[]data)
+{
+    if(isClose)
+     {
+	   return -1;
+     }
+	try {
+	  int r=socket.getInputStream().read(data);
+	  readLen+=r;
+	  flushTime=System.currentTimeMillis();
+	  if(flushTime-start>waitDataLen&&readLen==0)
+		{
+	      //等待时间长度，没有发送过接收过数据，则退出
+	       logger.info("缓冲时间到退出读取:"+socketID);
+		   return -1;
+		}
+	 return r;
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+	return -1;
+}
+
+/**
+ * 读取全部数据
+ */
+public byte[] readData()
+{
+	 byte[] result=null;
+	  if(socket!=null)
+	  {
+		  byte[]  readBytes=new byte[bufSize];//接收区
+		  int r=0;
+		  try {
+			  while(true)
+			  {
+				  if(isClose)
+					{
+						return null;
+					}
+		          r=socket.getInputStream().read(readBytes);
+		          if(r==-1)
+		          {
+		        	  result=pack.getData();
+		        	  break;
+		          }
+		          else
+		          {
+		              readLen+=r;
+		        	  if(r==0)
+		        	  {
+		        		  try {
+							TimeUnit.MILLISECONDS.sleep(100);
+							
+							continue;
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+		        	  }
+		        	 //
+		        		  byte[] buf=new byte[r];
+		        		  System.arraycopy(readBytes, 0, buf, 0, r);
+		        		  if(pack.addData(buf))
+		        		  {
+		        			  result=pack.getData();
+		        			  break;
+		        		  }
+		        	 
+		        	  
+		          }
+			  }
+		     
+		} catch (IOException e) {
+		
+			e.printStackTrace();
+		} 
+		
+	  }
+	  
+	  return result;
+}
+
+/*
+ * 获取初始化序列
+ */
+public long getInitSeqNo()
+{
+	if(socket!=null)
+	{
+	   return	socket.getSession().getInitialSequenceNumber();
+	}
+	return 0;
+}
+
+/**
+ * 发送包长
+ */
+public int getDataStreamLen()
+{
+    return socket.getSession().getDatagramSize();
+}
+
+
+public Destination getDestination()
+{
+
+    if(socket!=null)
+    {
+       return   socket.getSession().getDestination();
+    }
+    Destination tmp = null;
+    try {
+        tmp = new Destination(InetAddress.getLocalHost(), 0);
+    } catch (UnknownHostException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+    return tmp;
+}
+/**
+ * 发送数据
+ * 空数据不能发送
+ */
+public boolean sendData(byte[]data) {
+	if(isClose)
+	{
+		return false;
+	}
+	try {
+		socket.getOutputStream().write(data);
+		sendLen=+1;
+		flushTime=System.currentTimeMillis();
+		return true;
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+	return false;
+}
+public String getRemoteHost() {
+return	socket.getSession().getDestination().getAddress().getHostName();
+	
+}
+public int getRemotePort() {
+  return	socket.getSession().getDestination().getPort();
+}
+public long getID() {
+	
+	return socketID;
+}
+
+
+
+}
