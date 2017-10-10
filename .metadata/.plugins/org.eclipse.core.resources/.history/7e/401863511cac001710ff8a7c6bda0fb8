@@ -1,0 +1,38 @@
+/**
+ * 
+ */
+package judp;
+
+import java.nio.ByteBuffer;
+
+/**
+ * @author jinyu
+ *
+ */
+public class DataStruct {
+public int dataLen=0;
+public byte[][] buffer;
+public long id;
+public DataStruct(int num)
+{
+	buffer=new byte[num][];
+}
+private boolean check()
+{
+	
+}
+public boolean addData(byte[]data)
+{
+	ByteBuffer buf=ByteBuffer.wrap(data);
+	long id=buf.getLong();
+	int num=buf.getInt();
+	int index=buf.getInt();
+    dataLen=buf.getInt();
+    byte[] tmp=new byte[buf.limit()-buf.position()];
+    buf.get(tmp);
+    buffer[index]=tmp;
+    
+}
+
+
+}

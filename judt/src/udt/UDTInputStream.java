@@ -59,6 +59,10 @@ public class UDTInputStream extends InputStream {
 	private volatile boolean closed=false;
 
 	private volatile boolean blocking=true;
+	
+	private volatile boolean hasData=false;//cd
+	
+	
 
 	/**
 	 * create a new {@link UDTInputStream} connected to the given socket
@@ -166,6 +170,7 @@ public class UDTInputStream extends InputStream {
 	 * 
 	 */
 	protected boolean haveNewData(long sequenceNumber,byte[]data)throws IOException{
+		hasData=true;//cd
 		return receiveBuffer.offer(new AppData(sequenceNumber,data));
 	}
 
@@ -199,7 +204,38 @@ public class UDTInputStream extends InputStream {
 	protected void noMoreData()throws IOException{
 		expectMoreData.set(false);
 	}
-
+	
+	/**
+	 * 判断有没有数据进来
+	 * cd
+	 * @return
+	 */
+	 public boolean isHasData()
+     {
+     	return hasData;
+     }
+	 /**
+	  * 设置是读取为主还是写入为主
+	  * 如果是写入为主，当读取速度慢时，数据覆盖丢失
+	  * 默认读取为主，还没有读取则不允许覆盖，丢掉数据，等待重复
+	  * islagerRead=true才有意义
+	  * @param isRead
+	  */
+	 public void  resetBufMaster(boolean isRead)
+	 {
+		 receiveBuffer.resetBufMaster(isRead);
+		
+	 }
+	 
+	 /**
+	  * 设置大数据读取
+	  * 默认 false
+	  * @param islarge
+	  */
+	 public void setLargeRead(boolean islarge)
+	 {
+		 receiveBuffer.setLargeRead(islarge);
+	 }
 	/**
 	 * used for storing application data and the associated
 	 * sequence number in the queue in ascending order
@@ -248,8 +284,8 @@ public class UDTInputStream extends InputStream {
 				return false;
 			return true;
 		}
-
-
+        
+       
 	}
 
 }

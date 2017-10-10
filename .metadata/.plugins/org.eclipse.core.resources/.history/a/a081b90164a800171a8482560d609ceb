@@ -1,0 +1,25 @@
+/**
+ * 
+ */
+package judp;
+
+
+import udt.UDTSocket;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * @author jinyu
+ * Ω” ’∂À≈–∂œ
+ */
+public class SocketControls {
+	private ConcurrentHashMap<Long,judpGroupSocket> hash=new  ConcurrentHashMap<Long,judpGroupSocket>();
+public void addSocket(UDTSocket socket)
+{
+	judpGroupSocket group=hash.get(socket.getSession().getDestination().getSocketID());
+	if(group==null)
+	{
+		
+	}
+	
+}
+}

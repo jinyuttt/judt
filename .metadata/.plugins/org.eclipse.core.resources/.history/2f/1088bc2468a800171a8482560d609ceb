@@ -1,0 +1,77 @@
+/**
+ * 
+ */
+package judp;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import udt.UDTSocket;
+
+/**
+ * @author jinyu
+ * 按照目的分组
+ */
+public class judpGroupSocket {
+private ArrayList<UDTSocket> list=new ArrayList<UDTSocket>();
+public judpGroupSocket()
+{
+	
+}
+
+/**
+ * 添加socket
+ * @param socket
+ */
+public void addSocket(UDTSocket socket)
+{
+	list.add(socket);
+}
+
+/**
+ * 获取数据socket
+ * @return
+ */
+public UDTSocket getSocket()
+{
+	
+	int index=-1;
+	for( int i = 0 ; i < list.size() ; i++) {
+	    try {
+	    	if(index==-1)
+	    	{
+			  if(list.get(i).getInputStream().isHasData())
+			   {
+				//已经找到；其余的移除关
+				i=-1;//重新遍历
+				index=i;
+			   }
+	    	}
+	    	else
+	    	{
+	    		//
+	    		if(i==index)
+	    		{
+	    			continue;
+	    		}
+	    		else
+	    		{
+	    			list.get(i).close();
+	    			long id=list.get(i).getSession().getSocketID();
+	    			list.get(i).getEndpoint().removeSession(id);
+	    			
+	    		}
+	    		
+	    	}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	return null;
+	
+}
+public void clear()
+{
+	list.clear();
+}
+}

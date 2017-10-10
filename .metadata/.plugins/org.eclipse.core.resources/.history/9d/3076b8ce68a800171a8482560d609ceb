@@ -1,0 +1,70 @@
+/**
+ * 
+ */
+package judp;
+
+
+import udt.UDTSocket;
+
+import java.util.ArrayList;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
+
+/**
+ * @author jinyu
+ * 接收端判断
+ */
+public class SocketControls {
+ private static SocketControls instance;
+private ConcurrentHashMap<Long,judpGroupSocket> hash=new  ConcurrentHashMap<Long,judpGroupSocket>();
+ private static final Logger logger=Logger.getLogger(SocketManager.class.getName());
+ private SocketControls (){
+	  startThread();
+	   
+ }
+ 
+  private void startThread() {
+	Thread  processSocket=new Thread(new Runnable() {
+
+		@Override
+		public void run() {
+			ArrayList<UDTSocket> list=new ArrayList<UDTSocket>();
+			while(true)
+			{
+			   for(Entry<Long, judpGroupSocket> entry:hash.entrySet())
+			  {
+				   entry.getValue().getSocket();
+			  }
+			}
+		}
+		
+	});
+	processSocket.setDaemon(true);
+	processSocket.setName("processSocket");
+	processSocket.start();
+	
+}
+
+public static synchronized SocketControls getInstance() {  
+	   
+ if (instance == null) {  
+	
+    instance = new SocketControls();  
+ 
+  
+}  
+ return instance;  
+}
+public void addSocket(UDTSocket socket)
+{
+	long id=socket.getSession().getDestination().getSocketID();//同一个目的
+	judpGroupSocket group=hash.get(id);
+	if(group==null)
+	{
+		group=new judpGroupSocket();
+		hash.put(id, group);
+	}
+	group.addSocket(socket);
+}
+}

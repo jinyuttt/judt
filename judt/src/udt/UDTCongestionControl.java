@@ -151,7 +151,7 @@ public class UDTCongestionControl implements CongestionControl {
 					packetSendingPeriod=1000000.0/packetArrivalRate;
 				}
 				else{
-					packetSendingPeriod=congestionWindowSize/(roundTripTime+Util.getSYNTimeD());
+					packetSendingPeriod=(double)congestionWindowSize/(roundTripTime+Util.getSYNTimeD());
 				}
 			}
 

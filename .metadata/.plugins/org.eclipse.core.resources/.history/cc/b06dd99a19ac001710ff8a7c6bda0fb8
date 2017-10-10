@@ -1,0 +1,73 @@
+/**
+ * 
+ */
+package judp;
+import java.util.concurrent.atomic.AtomicLong;
+/**
+ * @author jinyu
+ *
+ */
+public class PackagetSub {
+ private static AtomicLong subid=new AtomicLong(0);
+ public static int  dataSzie=1472;
+ private static  int bufsize=0;
+ public byte[][] split(byte[]data)
+ {
+	 if(bufsize==0)
+     {
+     	bufsize=dataSzie-DataHead.headLen;
+     }
+     long session=sessionid.incrementAndGet();
+     int num=data.length/bufsize+data.length%bufsize;
+     byte[][]sendData=new byte[num][];
+     int index=0;
+     ByteBuffer buf=ByteBuffer.allocate(dataSzie);
+     DataHead  head=new DataHead(session,data.length,(byte) 0);
+     
+     for(int i=0;i<num;i++)
+     {
+    	 head.id=i;
+    	 buf.put(head.getBytes());//×°ÌîÍ·
+     	if(index+bufsize<data.length)
+     	{
+     	   buf.put(data, index, bufsize);
+     	}
+     	else
+     	{
+     		buf.put(data, index, data.length-index-1);
+     	}
+     	//
+     	byte[]tmp=new byte[buf.limit()];
+     	buf.flip();
+     	buf.get(tmp);
+     	sendData[i]=tmp;
+     	buf.clear();
+     }
+     SubData s=new SubData();
+     s.data=sendData;
+     s.sessionid=session;
+ 	return s;
+    
+     
+ }
+public static RecviceStruct addACKData(byte[]data)
+{
+   ByteBuffer buf=ByteBuffer.wrap(data);
+   DataHead head=new DataHead(0, 0, (byte) 0);
+   byte[]headByte=new byte[DataHead.headLen];
+   buf.get(headByte);
+   head.addhead(headByte);
+    byte[] tmp=null;
+    if(head.packType==0) 
+    {
+      tmp=new byte[buf.limit()-DataHead.headLen];
+      buf.get(tmp);
+    }
+//
+   RecviceStruct rcvData=new RecviceStruct();
+   rcvData.data=tmp;
+   rcvData.head=head;
+   return rcvData;
+}
+ 
+}

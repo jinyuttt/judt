@@ -1,0 +1,14 @@
+/**
+ * 
+ */
+package judp;
+
+/**
+ * @author jinyu
+ *
+ */
+public class DataStruct {
+public int dataLen=0;
+public byte[][] data;
+public long id;
+}

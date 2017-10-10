@@ -1,0 +1,27 @@
+/**
+ * 
+ */
+package net.File;
+
+import java.io.StringReader;
+
+import javax.swing.text.Document;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.xml.sax.InputSource;
+
+/**
+ * @author jinyu
+ *
+ */
+public class ReadXml {
+public String readXml(String file)
+{
+	StringReader sr = new StringReader(xmlStr); 
+	InputSource is = new InputSource(sr); 
+	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); 
+	DocumentBuilder builder=factory.newDocumentBuilder(); 
+	Document doc = builder.parse(is);
+}
+}
