@@ -25,11 +25,27 @@ private final int bufSize=10*1024*1024;
 private String remoteHost="";
 private int remotePort=0;
 private static  Logger log=Logger.getLogger(SendFiles.class.getName());
+
+/**
+ * 
+ * 创建一个新的实例 SendFiles.    
+ *    
+ * @param host 远端Ip
+ * @param port 远端端口
+ */
 	public SendFiles(String host,int port)
 	{
 		this.remoteHost=host;
 		this.remotePort=port;
 	}
+	
+	/**
+	 * 
+	* @Title: sendFile
+	* @Description: 发送文件 
+	* @param @param path    文件路径或者目录
+	* @return void    返回类型
+	 */
 public void sendFile(String path)
 {
 	File dir=new File(path);
@@ -49,6 +65,14 @@ public void sendFile(String path)
     }
     readSend(f);
 }
+
+/**
+ * 
+* @Title: readSend
+* @Description: 发送数据
+* @param @param files    参数
+* @return void    返回类型
+ */
 private void readSend(File[]files)
 {
 	if(files==null||files.length==0)
@@ -63,6 +87,14 @@ private void readSend(File[]files)
 		
 	}
 }
+
+/**
+ * 
+* @Title: sigleFile
+* @Description: 单文件发送
+* @param @param f    参数
+* @return void    返回类型
+ */
 private void  sigleFile(File f)
 {
 	client=new judpClient();

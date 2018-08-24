@@ -20,14 +20,23 @@ public class SocketControls {
  private static SocketControls instance;
 private ConcurrentHashMap<Long,judpGroupSocket> hash=new  ConcurrentHashMap<Long,judpGroupSocket>();
 //private static final Logger logger=Logger.getLogger(SocketManager.class.getName());
- private ArrayBlockingQueue<UDTSocket> hasSocket=new  ArrayBlockingQueue<UDTSocket>(1000);
+
+/**
+ * 保持有数据的通信对象
+ */
+private ArrayBlockingQueue<UDTSocket> hasSocket=new  ArrayBlockingQueue<UDTSocket>(1000);
  private SocketControls (){
 	  startThread();
 	   
  }
  
+ 
  /**
-  * 启动线程检查数据源
+  * 
+ * @Title: startThread
+ * @Description: 启动线程监测数据源，移除无用连接
+ * @param     参数
+ * @return void    返回类型
   */
   private void startThread() {
 	Thread  processSocket=new Thread(new Runnable() {

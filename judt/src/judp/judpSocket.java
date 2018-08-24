@@ -54,8 +54,9 @@ public long getSocketID()
 
 /**
  * 关闭
- * 等待数据完成关闭
+ * 等待数据完成关闭，shutdown取代
  */
+@Deprecated
 public void close()
 {
 	isClose=true;
@@ -119,8 +120,9 @@ public void close()
 }
 
 /**
- * 立即关闭
+ * 立即关闭，shutdown取代
  */
+@Deprecated
 public void stop()
 {
 	//没有发送则可以直接关闭，不需要等待数据发送完成
@@ -142,6 +144,29 @@ public void stop()
 	 System.out.println("物理关闭socket");
 }
 
+/**
+ * 
+* @Title: shutdown
+* @Description: 10s内关闭通信
+* @param     参数
+* @return void    返回类型
+ */
+public void shutdown()
+{
+	this.close();
+}
+
+/**
+ * 
+* @Title: shutdownNow
+* @Description: 立即关闭通信
+* @param     参数
+* @return void    返回类型
+ */
+public void shutdownNow()
+{
+	this.stop();
+}
 /**
  * 读取数据
  * 返回接收的字节大小
@@ -256,6 +281,8 @@ public Destination getDestination()
     }
     return tmp;
 }
+
+
 /**
  * 发送数据
  * 空数据不能发送
@@ -337,7 +364,7 @@ public long getID() {
 /**
  * 设置是读取为主还是写入为主
  * 如果是写入为主，当读取速度慢时，数据覆盖丢失
- * 默认读取为主，还没有读取则不允许覆盖，丢掉数据，等待重复
+ * 默认读取为主，还没有读取则不允许覆盖，丢掉数据，等待重发
  * 设置大数据读取才有意义
  * @param isRead
  */

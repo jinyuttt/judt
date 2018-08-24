@@ -32,10 +32,28 @@ private Thread recThread=null;
 private static  Logger log=Logger.getLogger(RecviceFiles.class.getName());
 private String dir="";
 private ExecutorService pools = Executors.newCachedThreadPool();
+
+/**
+ * 
+* @Title: setDir
+* @Description: 设置接收文件的目录
+* @param @param dir    参数
+* @return void    返回类型
+ */
 public void setDir(String dir)
 {
 	this.dir=dir;
 }
+
+/**
+ * 
+* @Title: start
+* @Description: 接收文件
+* @param @param host 本机IP
+* @param @param port 本机端口
+* @param @return    参数
+* @return boolean    返回类型
+ */
 public boolean start(String host,int port)
 {
 	File cur=new File(dir);
@@ -62,6 +80,8 @@ public boolean start(String host,int port)
 			private long sumBytes=0;
 			private ConcurrentLinkedQueue<byte[]> recQueue=new ConcurrentLinkedQueue<byte[]>();
 			private boolean  isStop=false;
+			
+			
 			/**
 			 * 写入文件
 			 * @param data
@@ -235,7 +255,7 @@ public boolean start(String host,int port)
 				   }
 			   }
 				//
-				ss.close();
+				ss.shutdown();
 				
 			}
 		});

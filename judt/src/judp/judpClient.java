@@ -222,22 +222,15 @@ public class judpClient {
 	  {
 		  if(sumLen==0)
 		  {
-			  //没有发送数据
-			  //立即关闭
-			  try {
-			      if(!client.isClose())
-				    client.shutdown();
-			} catch (IOException e) {
-				
-				e.printStackTrace();
-			}
+			  if(!client.isClose())
+			    client.shutdown();
 		  }
 		  else
 		  {
 			  //开始缓存
 			  //SocketManager.getInstance().add(client);
 			  if(!client.isClose())
-					client.close();
+					client.shutdown();
 		  }
 	  }
   }

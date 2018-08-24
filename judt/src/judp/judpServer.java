@@ -142,8 +142,10 @@ public judpSocket accept()
   UDTSocket socket=SocketControls.getInstance().getSocket();
   if(socket==null)
   {
+	  //再次获取下一个
 	  socket=SocketControls.getInstance().getSocket();
   }
+  //包装
   judpSocket jsocket=new judpSocket(socket);
   judpSocketManager.getInstance(socket.getEndpoint()).addSocket(jsocket);
   return jsocket;

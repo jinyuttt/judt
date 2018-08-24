@@ -27,7 +27,7 @@ public class TestRecFiles {
 		  {
 			  config=xml.split(",");
 		  }
-		RecviceFiles rec=new RecviceFiles();
+		    RecviceFiles rec=new RecviceFiles();
             String dir=config[2];
 			rec.setDir(dir);
 			rec.start(config[0], Integer.valueOf(config[1]));

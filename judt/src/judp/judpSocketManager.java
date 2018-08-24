@@ -35,8 +35,13 @@ public class judpSocketManager {
 		 
 	  }
 	  
+	  
 	  /**
-	   * 清理没有使用的judpSocket
+	   * 
+	  * @Title: startGC
+	  * @Description: 服务端会有很多session,清除没有使用的
+	  * @param     参数
+	  * @return void    返回类型
 	   */
 	   private void startGC() {
 		   Thread clearSession=new Thread(new Runnable() {
@@ -62,7 +67,7 @@ public class judpSocketManager {
 									serversession.getSocket().getSender().stop();
 									logger.info("清除socket："+id);
 								}
-									}
+							}
 									catch(Exception ex)
 									{
 										logger.warning("清除session："+ex.getMessage());

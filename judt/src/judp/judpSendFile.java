@@ -55,7 +55,14 @@ public class judpSendFile {
 
     }
     
-    
+  
+    /**
+     * 
+    * @Title: startSend
+    * @Description: 开始发送
+    * @param     参数
+    * @return void    返回类型
+     */
   public void startSend()
   {
       threadPool.execute(new Runnable() {
@@ -72,7 +79,7 @@ public class judpSendFile {
             {
                 server=new judpServer(host,serverPort);
             }
-            server.Start();
+            server.start();
             while(true){
                 judpSocket socket=server.accept();
                 Thread.sleep(1000);

@@ -15,7 +15,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author jinyu
- *
+ * 监视目录
  */
 public class FilesWatch {
 	
@@ -33,14 +33,38 @@ private	WatchService watcher = null;
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * 
+	* @Title: setWatch
+	* @Description: 设置监视的目录
+	* @param @param dir    参数
+	* @return void    返回类型
+	 */
 	public void setWatch(String dir)
 	{
 		this.dir=dir;
 	}
+	
+	/**
+	 * 
+	* @Title: stop
+	* @Description: 停止监视
+	* @param     参数
+	* @return void    返回类型
+	 */
 	public void stop()
 	{
 		isStop=true;
 	}
+	
+	/**
+	 * 
+	* @Title: take
+	* @Description: 获取目录的变化信息
+	* @param @return    参数
+	* @return FileMonitor    返回类型
+	 */
 	public FileMonitor take()
 	{
 		try {
@@ -51,6 +75,15 @@ private	WatchService watcher = null;
 		}
 		return null;
 	}
+	
+	
+	/**
+	 * 
+	* @Title: start
+	* @Description:启动监视
+	* @param     参数
+	* @return void    返回类型
+	 */
 	public void start()
 	{
 		checkThread =new Thread(new Runnable() {

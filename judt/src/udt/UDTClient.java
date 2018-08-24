@@ -128,11 +128,18 @@ public class UDTClient {
 		clientSession.getSocket().flush();
 	}
 
-
-	public void shutdown()throws IOException{
-
+    /**
+     * 
+    * @Title: shutdown
+    * @Description: 关闭连接
+    * @param @throws IOException    参数
+    * @return void    返回类型
+     */
+	public void shutdownNow()throws IOException{
+        //如果客户端已经就绪并且激活（数据交互）
 		if (clientSession.isReady()&& clientSession.active==true) 
 		{
+			//发送多次关闭信息
 			Shutdown shutdown = new Shutdown();
 			shutdown.setDestinationID(clientSession.getDestination().getSocketID());
 			shutdown.setSession(clientSession);
@@ -146,11 +153,13 @@ public class UDTClient {
 			}
 			clientSession.getSocket().getReceiver().stop();
 			clientEndpoint.stop();
-			//cd 添加
+			//cd 添加  客户端一旦关闭就无效了，可以不移除，该对象关闭则不能使用了
 			clientEndpoint.removeSession(clientSession.getSocketID());
+			//关闭发送
 			clientSession.getSocket().getSender().stop();
 			close=true;
 		}
+		clientEndpoint.stop();
 	}
 
 	public UDTInputStream getInputStream()throws IOException{
@@ -175,11 +184,15 @@ public class UDTClient {
 	    return clientSession.getSocketID();
 	}
 	
+	
 	/**
-	 * 同步关闭
-	 * 等待数据发送完成后再关闭
-	 * 但是只等待10ss
+	 * 已经被shutdown方法取代
+	* @Title: close
+	* @Description: 10s内等待数据发送完成后关闭
+	* @param     参数
+	* @return void    返回类型
 	 */
+	@Deprecated
 	public synchronized void close()
 	{
 		close=true;
@@ -192,10 +205,11 @@ public class UDTClient {
 					int num=0;
 				while(true)
 				{
+					//没有发送数据，直接关闭
 					if(clientSession.getSocket().getSender().isSenderEmpty())
 					{
 						try {
-							shutdown();
+							shutdownNow();
 							break;
 						} catch (IOException e) {
 						
@@ -204,13 +218,14 @@ public class UDTClient {
 					}
 					else
 					{
+						//每100ms监测一次发送情况
 						try {
 							TimeUnit.MILLISECONDS.sleep(100);
 							num++;
 							if(waitClose<=num*100)
 							{
 								try {
-									shutdown();
+									shutdownNow();
 								} catch (IOException e) {
 								
 									e.printStackTrace();
@@ -230,16 +245,31 @@ public class UDTClient {
 			closeThread.setDaemon(true);
 			closeThread.setName("closeThread");
 		}
-		if(closeThread.isAlive())
-		{
-			return;
-		}
-		else
+		if(!closeThread.isAlive())
 		{
 			closeThread.start();
 		}
 	}
 	
+	/**
+	 * 
+	* @Title: shutdown
+	* @Description: 关闭连接
+	* @param     参数
+	* @return void    返回类型
+	 */
+	public synchronized void shutdown()
+	{
+		this.close();
+	}
+	
+	/**
+	 * 
+	* @Title: isClose
+	* @Description: 判断是否已经关闭
+	* @param @return    参数
+	* @return boolean    返回类型
+	 */
 	public boolean isClose()
 	{
 	    return close;

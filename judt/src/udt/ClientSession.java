@@ -67,9 +67,7 @@ public class ClientSession extends UDTSession {
 
 	public void connect() throws InterruptedException,IOException{
 		int n=0;
-		
 		while(getState()!=ready){
-		   
 			sendHandShake();
 			if(getState()==invalid)throw new IOException("Can't connect!");
 			n++;
@@ -87,9 +85,7 @@ public class ClientSession extends UDTSession {
 
 		if (packet instanceof ConnectionHandshake) {
 			ConnectionHandshake hs=(ConnectionHandshake)packet;
-
 			logger.info("Received connection handshake from "+peer+"\n"+hs);
-       
 			if (getState()!=ready) {
 				if(hs.getConnectionType()==1){
 					try{
@@ -110,10 +106,9 @@ public class ClientSession extends UDTSession {
 						destination.setSocketID(peerSocketID);
 						setState(ready);
 						Thread.sleep(50);
+						//多个握手序列，使用接收的第一个
 						this.setInitialSequenceNumber(hs.getInitialSeqNo());//cd 必须重置
-						System.out.println("初始序列置回2:"+this.getInitialSequenceNumber());
 						socket=new UDTSocket(endPoint,this);
-						
 					}catch(Exception ex){
 						logger.log(Level.WARNING,"Error creating socket",ex);
 						setState(invalid);

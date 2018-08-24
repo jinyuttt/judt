@@ -178,6 +178,7 @@ public class UDPEndPoint {
 	public void stop(){
 		stopped=true;
 		dgSocket.close();
+		sessions.clear();//cd 2018-08-25
 	}
 
 	/**
@@ -303,7 +304,7 @@ public class UDPEndPoint {
 							session=lastSession;
 						}
 						else{
-							session=sessions.get(dest);//cd
+							session=sessions.get(dest);//cd ªÒ»°session
 							lastSession=session;
 							lastDestID=dest;
 						}

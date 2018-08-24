@@ -26,6 +26,7 @@ public class TestSendFiles {
 		//192.168.30.128
 		
 		ReadXml rd=new ReadXml();
+		//读取IP，端口
 	   String xml=	rd.readXml(ReadXml.getPath()+"/Config.xml");
 	   String[] config=null;
 	  if(xml!=null)
@@ -39,6 +40,7 @@ public class TestSendFiles {
 		 watch.start();
 		 while(true)
 		 {
+			 //有文件就发送
 			 FileMonitor ff=  watch.take();
 			 log.info(ff.file);
 			 if(ff.file.endsWith(".tmp"))

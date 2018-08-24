@@ -9,9 +9,20 @@ import java.util.logging.Logger;
 
 import udt.UDTSocket;
 
+
 /**
- * @author jinyu
- * 按照目的分组
+ * 
+ *     
+ * 项目名称：judt    
+ * 类名称：judpGroupSocket    
+ * 类描述：    按照目的地址分组socket
+ * 创建人：jinyu    
+ * 创建时间：2018年8月25日 上午10:53:59    
+ * 修改人：jinyu    
+ * 修改时间：2018年8月25日 上午10:53:59    
+ * 修改备注：    
+ * @version   1.0   
+ *
  */
 public class judpGroupSocket {
 private ArrayList<UDTSocket> list=new ArrayList<UDTSocket>();
@@ -39,13 +50,14 @@ public UDTSocket getSocket()
 {
 	
 	int index=-1;
-	for( int i = 0 ; i < list.size() ; i++) {
+	int size=list.size();
+	for( int i = 0 ; i < size ; i++) {
 	    try {
 	    	if(index==-1)
 	    	{
 			  if(list.get(i).getInputStream().isHasData())
 			   {
-				//已经找到；其余的移除关
+				 //已经找到；其余的移除关
 				  index=i;
 				   i=-1;//重新遍历
 			   }
@@ -80,6 +92,7 @@ public UDTSocket getSocket()
 	return null;
 	
 }
+
 /**
  * 清除所有socket
  */
