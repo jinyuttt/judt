@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import udt.UDTSession;
 import udt.UDTSocket;
 
 
@@ -61,6 +62,20 @@ public UDTSocket getSocket()
 				  index=i;
 				   i=-1;//重新遍历
 			   }
+			  //
+			  UDTSession session=list.get(i).getSession();
+			  if(session.getState()==UDTSession.shutdown)
+			  {
+				  //说明已经关闭
+				     list.get(i).close();
+	    			long id=list.get(i).getSession().getSocketID();
+	    			list.get(i).getEndpoint().removeSession(id);
+	    			list.get(i).getReceiver().stop();
+	    			list.get(i).getSender().stop();
+	    			list.get(i).getSender().pause();
+	    			list.remove(i);
+	    			i--;
+			  }
 	    	}
 	    	else
 	    	{

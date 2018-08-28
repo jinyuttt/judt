@@ -272,6 +272,7 @@ public class UDTClient {
 	 */
 	public boolean isClose()
 	{
-	    return close;
+		//¶Ô·½¹Ø±Õ
+	    return close||!clientSession.active;
 	}
 }

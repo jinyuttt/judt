@@ -35,6 +35,7 @@ package udt.packets;
 import java.io.ByteArrayOutputStream;
 
 import udt.UDTSession;
+import udt.util.Tools;
 
 public class ConnectionHandshake extends ControlPacket {
 	private long udtVersion=4;
@@ -58,6 +59,9 @@ public class ConnectionHandshake extends ControlPacket {
 	private long socketID;
 	
 	private long cookie=0;
+	
+	private long[] peerIP=new long[4];//cd 2018-08-28
+
 	
 	public ConnectionHandshake(){
 		this.controlPacketType=ControlPacketType.CONNECTION_HANDSHAKE.ordinal();
@@ -85,6 +89,21 @@ public class ConnectionHandshake extends ControlPacket {
 		if(data.length>28){
 			cookie=PacketUtil.decode(data, 28);
 		}
+		if(data.length>32)
+		{
+			//cd 
+			cookie=PacketUtil.decode(data, 32);
+		}
+	     if(data.length>36)
+	     {
+	    	 peerIP[0]=PacketUtil.decode(data, 36);
+
+	    	 peerIP[1]=PacketUtil.decode(data, 40);
+
+	    	 peerIP[2]=PacketUtil.decode(data, 44);
+
+	    	 peerIP[3]=PacketUtil.decode(data, 48);
+	     }
 	}
 
 	public long getUdtVersion() {
@@ -136,6 +155,28 @@ public class ConnectionHandshake extends ControlPacket {
 		this.socketID = socketID;
 	}
 	
+	public long getcookie()
+	{
+		return this.cookie;
+	}
+	
+	public void setcookie(long cookie)
+	{
+		this.cookie=cookie;
+	}
+	
+	public long[] getPeerIP()
+	{
+		return this.peerIP;
+	}
+	public void setPeerIP(long[] srv)
+	{
+		this.peerIP=srv;
+	}
+	public void setPeerIP(String addr)
+	{
+		this.peerIP=Tools.iptopeer(addr);
+	}
 	@Override
 	public byte[] encodeControlInformation(){
 		try {
@@ -147,6 +188,11 @@ public class ConnectionHandshake extends ControlPacket {
 			bos.write(PacketUtil.encode(maxFlowWndSize));
 			bos.write(PacketUtil.encode(connectionType));
 			bos.write(PacketUtil.encode(socketID));
+			bos.write(PacketUtil.encode(cookie));//cd 2018-08-28
+			for(int i=0;i<4;i++)
+			{
+			    bos.write(PacketUtil.encode(peerIP[i]));
+			}
 			return bos.toByteArray();
 		} catch (Exception e) {
 			// can't happen

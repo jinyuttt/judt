@@ -102,6 +102,7 @@ public class ClientSession extends UDTSession {
 				else{
 					try{
 						//TODO validate parameters sent by peer
+						//理论上这里是getConnectionType==-1
 						long peerSocketID=hs.getSocketID();
 						destination.setSocketID(peerSocketID);
 						setState(ready);
@@ -154,6 +155,8 @@ public class ClientSession extends UDTSession {
 		handshake.setPacketSize(getDatagramSize());
 		handshake.setSocketID(mySocketID);
 		handshake.setMaxFlowWndSize(flowWindowSize);
+		//cd 2018-08-28
+		handshake.setPeerIP(this.endPoint.getLocalAddress().toString());
 		handshake.setSession(this);
 		logger.info("Sending "+handshake);
 		endPoint.doSend(handshake);
@@ -169,6 +172,10 @@ public class ClientSession extends UDTSession {
 		handshake.setPacketSize(hs.getPacketSize());
 		handshake.setSocketID(mySocketID);
 		handshake.setMaxFlowWndSize(flowWindowSize);
+		//cd 2018-08-28
+		handshake.setcookie(hs.getcookie());
+		handshake.setPeerIP(hs.getPeerIP());
+		//
 		handshake.setSession(this);
 		logger.info("Sending confirmation "+handshake);
 		endPoint.doSend(handshake);
