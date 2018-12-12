@@ -89,20 +89,15 @@ public class ConnectionHandshake extends ControlPacket {
 		if(data.length>28){
 			cookie=PacketUtil.decode(data, 28);
 		}
-		if(data.length>32)
-		{
-			//cd 
-			cookie=PacketUtil.decode(data, 32);
-		}
-	     if(data.length>36)
+	   if(data.length>32)
 	     {
-	    	 peerIP[0]=PacketUtil.decode(data, 36);
+	    	 peerIP[0]=PacketUtil.decode(data, 32);
 
-	    	 peerIP[1]=PacketUtil.decode(data, 40);
+	    	 peerIP[1]=PacketUtil.decode(data, 34);
 
-	    	 peerIP[2]=PacketUtil.decode(data, 44);
+	    	 peerIP[2]=PacketUtil.decode(data, 40);
 
-	    	 peerIP[3]=PacketUtil.decode(data, 48);
+	    	 peerIP[3]=PacketUtil.decode(data, 44);
 	     }
 	}
 
