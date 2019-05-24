@@ -33,6 +33,7 @@
 package udt.packets;
 
 import java.io.ByteArrayOutputStream;
+import java.net.InetAddress;
 
 import udt.UDTSession;
 import udt.util.Tools;
@@ -164,12 +165,25 @@ public class ConnectionHandshake extends ControlPacket {
 	{
 		return this.peerIP;
 	}
+	
 	public void setPeerIP(long[] srv)
 	{
 		this.peerIP=srv;
 	}
+	
 	public void setPeerIP(String addr)
 	{
+		//理论上，不发送0.0.0.0无效IP
+		if(addr.contains("0.0.0.0"))
+		{
+			try {
+				InetAddress localAddr = Tools.getLocalHostLANAddress();
+				addr=localAddr.getHostAddress();
+			} catch (Exception e) {
+				
+				e.printStackTrace();
+			}
+		}
 		this.peerIP=Tools.iptopeer(addr);
 	}
 	@Override

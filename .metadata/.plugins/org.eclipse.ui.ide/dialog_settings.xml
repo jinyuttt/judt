@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="CleanDialogSettings">
-		<item value="500" key="DIALOG_WIDTH"/>
-		<item value="false" key="TOGGLE_SELECTED"/>
-		<item value="417" key="DIALOG_HEIGHT"/>
-		<item value="433" key="DIALOG_X_ORIGIN"/>
-		<item value="86" key="DIALOG_Y_ORIGIN"/>
+		<item key="DIALOG_WIDTH" value="500"/>
+		<item key="TOGGLE_SELECTED" value="false"/>
+		<item key="DIALOG_HEIGHT" value="417"/>
+		<item key="DIALOG_X_ORIGIN" value="433"/>
+		<item key="DIALOG_Y_ORIGIN" value="86"/>
 	</section>
 	<section name="ExternalProjectImportWizard">
-		<item value="false" key="WizardProjectsImportPage.STORE_NESTED_PROJECTS"/>
-		<item value="false" key="WizardProjectsImportPage.STORE_COPY_PROJECT_ID"/>
-		<item value="false" key="WizardProjectsImportPage.STORE_ARCHIVE_SELECTED"/>
+		<item key="WizardProjectsImportPage.STORE_NESTED_PROJECTS" value="false"/>
+		<item key="WizardProjectsImportPage.STORE_COPY_PROJECT_ID" value="false"/>
+		<item key="WizardProjectsImportPage.STORE_ARCHIVE_SELECTED" value="false"/>
 		<list key="WizardProjectsImportPage.STORE_DIRECTORIES">
 			<item value="E:\Study\java\judt"/>
 		</list>
@@ -23,12 +23,12 @@
 		</list>
 	</section>
 	<section name="NewWizardAction">
-		<item value="org.eclipse.jdt.ui.wizards.JavaProjectWizard" key="NewWizardSelectionPage.STORE_SELECTED_ID"/>
+		<item key="NewWizardSelectionPage.STORE_SELECTED_ID" value="org.eclipse.jdt.ui.wizards.JavaProjectWizard"/>
 		<list key="NewWizardSelectionPage.STORE_EXPANDED_CATEGORIES_ID">
 		</list>
 	</section>
 	<section name="ChooseWorkspaceDialogSettings">
-		<item value="379" key="DIALOG_X_ORIGIN"/>
-		<item value="160" key="DIALOG_Y_ORIGIN"/>
+		<item key="DIALOG_X_ORIGIN" value="379"/>
+		<item key="DIALOG_Y_ORIGIN" value="160"/>
 	</section>
 </section>

@@ -233,6 +233,7 @@ public class ServerSession extends UDTSession {
 		{
 			buf.put(bytes);
 		}
+		buf.flip();
 		return buf.getInt();
 	}
 }

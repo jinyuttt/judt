@@ -98,7 +98,7 @@ public class judpRecviceFile {
                     
                         System.out.println("[ReceiveFile] Reading <"+size+"> bytes.");
                         long start = System.currentTimeMillis();
-                        ApplicationCode.CopySocketFile(fos, client,size,false);
+                        ApplicationCode.CopySocketFile(fos, client,size,true);
                         long end = System.currentTimeMillis();
                         double rate=1000.0*size/1024/1024/(end-start);
                         System.out.println("[ReceiveFile] Rate: "+format.format(rate)+" MBytes/sec. "

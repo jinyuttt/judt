@@ -56,11 +56,13 @@ public UDTSocket getSocket()
 	    try {
 	    	if(index==-1)
 	    	{
+	         //UDTSocket udt=list.get(i);
 			  if(list.get(i).getInputStream().isHasData())
 			   {
 				 //已经找到；其余的移除关
-				  index=i;
+				   index=i;
 				   i=-1;//重新遍历
+				   continue;
 			   }
 			  //
 			  UDTSession session=list.get(i).getSession();

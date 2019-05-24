@@ -84,10 +84,17 @@ public class Tools {
 		}
 		return address;
 	}
+	
+	
+	/*
+	 * IP转换
+	 */
 	public static long ipToLong(String strIp) {
 		String[]ip = strIp.split("\\.");
 		return (Long.parseLong(ip[0]) << 24) + (Long.parseLong(ip[1]) << 16) + (Long.parseLong(ip[2]) << 8) + Long.parseLong(ip[3]);
 	}
+	
+	
 	public static String longToIP(long longIp) {
 		StringBuffer sb = new StringBuffer("");
 		// 直接右移24位
@@ -103,6 +110,8 @@ public class Tools {
 		sb.append(String.valueOf((longIp & 0x000000FF)));
 		return sb.toString();
 	}
+	
+	
 	public static long[] ip6ToLong(String strIp) {
 		long[]ips=new long[4];
 		String[]ip = strIp.split(":");
@@ -155,6 +164,8 @@ public class Tools {
 		}
 		return ips;
 	}
+	
+	
 	public static String string2MD5(String inStr){  
         MessageDigest md5 = null;  
         try{  

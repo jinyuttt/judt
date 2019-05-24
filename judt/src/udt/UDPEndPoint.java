@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -118,7 +119,6 @@ public class UDPEndPoint {
 		}
 		if(localPort>0)this.port = localPort;
 		else port=dgSocket.getLocalPort();
-		
 		//set a time out to avoid blocking in doReceive()
 		dgSocket.setSoTimeout(100000);
 		//buffer size

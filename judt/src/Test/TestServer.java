@@ -15,7 +15,7 @@ import judp.judpSocket;
 public class TestServer {
 	public static void main(String[] args) {
 	  //192.168.30.128
-		judpServer  server=new judpServer("192.168.30.128",5555);
+		judpServer  server=new judpServer("192.168.3.104",5555);
 		server.start();
 		while(true)
 		{

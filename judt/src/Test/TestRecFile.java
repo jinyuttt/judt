@@ -29,7 +29,7 @@ import judp.judpRecviceFile;
 public class TestRecFile {
     
     public static void main(String[] args) {
-        judpRecviceFile rec=new judpRecviceFile("192.168.10.86", 5555, "E:\\Study\\java\\filesudt\\send\\12.rmvb", "E:\\Study\\java\\filesudt\\rec\\1.rmvb");
+        judpRecviceFile rec=new judpRecviceFile("192.168.3.104", 5555, "E:\\Study\\java\\filesudt\\send\\12.qlv", "E:\\Study\\java\\filesudt\\rec\\13.rmvb");
         rec.start();
         try {
             System.in.read();

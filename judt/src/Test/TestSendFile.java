@@ -41,7 +41,7 @@ public class TestSendFile {
        
     */
     public static void main(String[] args) {
-        judpSendFile jsend=new judpSendFile("192.168.10.86",5555);
+        judpSendFile jsend=new judpSendFile("192.168.3.104",5555);
         jsend.startSend();
         
         try {

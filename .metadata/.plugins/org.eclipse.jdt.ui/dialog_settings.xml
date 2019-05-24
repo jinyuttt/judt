@@ -1,56 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
-	<item value="0" key="CallHierarchyViewPart.call_mode"/>
-	<item value="2" key="CallHierarchyViewPart.field_mode"/>
-	<item value="D:\java\eclipse模板,注释" key="org.eclipse.jdt.ui.codeformatter.loadpath"/>
-	<item value="3" key="CallHierarchyViewPart.orientation"/>
-	<item value="498" key="CallHierarchyViewPart.ratio1"/>
-	<item value="1" key="SearchScopeActionGroup.search_scope_type"/>
-	<item value="500" key="CallHierarchyViewPart.ratio3"/>
+	<item key="CallHierarchyViewPart.call_mode" value="0"/>
+	<item key="CallHierarchyViewPart.field_mode" value="2"/>
+	<item key="org.eclipse.jdt.ui.codeformatter.loadpath" value="D:\java\eclipse模板,注释"/>
+	<item key="CallHierarchyViewPart.orientation" value="3"/>
+	<item key="CallHierarchyViewPart.ratio1" value="498"/>
+	<item key="SearchScopeActionGroup.search_scope_type" value="1"/>
+	<item key="CallHierarchyViewPart.ratio3" value="500"/>
+	<item key="TypeHierarchyViewPart.hierarchyview" value="2"/>
+	<item key="TypeHierarchyViewPart.qualifiednames" value="false"/>
+	<item key="TypeHierarchyViewPart.linkeditors" value="false"/>
+	<item key="TypeHierarchyViewPart.orientation" value="3"/>
+	<item key="CallHierarchyViewPart.ratio0" value="498"/>
 	<list key="SearchScopeActionGroup.working_set">
 	</list>
 	<section name="CallHierarchySearchScope">
 	</section>
 	<section name="SearchInDialog">
-		<item value="true" key="SearchInProjects"/>
-		<item value="true" key="SearchInAppLibs"/>
-		<item value="true" key="SearchInJRE"/>
-		<item value="true" key="SearchInSources"/>
+		<item key="SearchInProjects" value="true"/>
+		<item key="SearchInAppLibs" value="true"/>
+		<item key="SearchInJRE" value="true"/>
+		<item key="SearchInSources" value="true"/>
 	</section>
 	<section name="NewClassWizardPage">
-		<item value="false" key="create_constructor"/>
-		<item value="true" key="create_unimplemented"/>
+		<item key="create_constructor" value="false"/>
+		<item key="create_unimplemented" value="true"/>
 	</section>
 	<section name="OptionalMessageDialog.hide.">
-		<item value="true" key="org.eclipse.jdt.ui.typecomment.deprecated"/>
+		<item key="org.eclipse.jdt.ui.typecomment.deprecated" value="true"/>
 	</section>
 	<section name="quick_assist_proposal_size">
 	</section>
 	<section name="completion_proposal_size">
 	</section>
 	<section name="JarPackageWizard">
-		<item value="false" key="JarPackageWizardPage.INCLUDE_DIRECTORY_ENTRIES"/>
-		<item value="" key="JarManifestWizardPage.MANIFEST_LOCATION"/>
-		<item value="false" key="JarManifestWizardPage.SEAL_JAR"/>
-		<item value="true" key="JarPackageWizardPage.COMPRESS"/>
-		<item value="false" key="JarManifestWizardPage.REUSE_MANIFEST"/>
-		<item value="false" key="jarOptionsWizardPage.STORE_USE_SRC_FOLDERS"/>
-		<item value="true" key="jarOptionsWizardPage.EXPORT_WARNINGS"/>
-		<item value="" key="jarOptionsWizardPage.DESCRIPTION_LOCATION"/>
-		<item value="true" key="jarOptionsWizardPage.BUILD_IF_NEEDED"/>
-		<item value="false" key="JarPackageWizardPage.EXPORT_JAVA_FILES"/>
-		<item value="true" key="jarOptionsWizardPage.EXPORT_ERRORS"/>
-		<item value="true" key="JarManifestWizardPage.GENERATE_MANIFEST"/>
-		<item value="true" key="JarPackageWizardPage.EXPORT_CLASS_FILES"/>
-		<item value="false" key="JarPackageWizardPage.OVERWRITE"/>
-		<item value="false" key="jarOptionsWizardPage.SAVE_DESCRIPTION"/>
-		<item value="false" key="JarPackageWizardPage.REFACTORINGS"/>
-		<item value="false" key="JarManifestWizardPage.SAVE_MANIFEST"/>
-		<item value="false" key="JarPackageWizardPage.EXPORT_OUTPUT_FOLDER"/>
+		<item key="JarPackageWizardPage.INCLUDE_DIRECTORY_ENTRIES" value="false"/>
+		<item key="JarManifestWizardPage.MANIFEST_LOCATION" value=""/>
+		<item key="JarManifestWizardPage.SEAL_JAR" value="false"/>
+		<item key="JarPackageWizardPage.COMPRESS" value="true"/>
+		<item key="JarManifestWizardPage.REUSE_MANIFEST" value="false"/>
+		<item key="jarOptionsWizardPage.STORE_USE_SRC_FOLDERS" value="false"/>
+		<item key="jarOptionsWizardPage.EXPORT_WARNINGS" value="true"/>
+		<item key="jarOptionsWizardPage.DESCRIPTION_LOCATION" value=""/>
+		<item key="jarOptionsWizardPage.BUILD_IF_NEEDED" value="true"/>
+		<item key="JarPackageWizardPage.EXPORT_JAVA_FILES" value="false"/>
+		<item key="jarOptionsWizardPage.EXPORT_ERRORS" value="true"/>
+		<item key="JarManifestWizardPage.GENERATE_MANIFEST" value="true"/>
+		<item key="JarPackageWizardPage.EXPORT_CLASS_FILES" value="true"/>
+		<item key="JarPackageWizardPage.OVERWRITE" value="false"/>
+		<item key="jarOptionsWizardPage.SAVE_DESCRIPTION" value="false"/>
+		<item key="JarPackageWizardPage.REFACTORINGS" value="false"/>
+		<item key="JarManifestWizardPage.SAVE_MANIFEST" value="false"/>
+		<item key="JarPackageWizardPage.EXPORT_OUTPUT_FOLDER" value="false"/>
 		<list key="JarPackageWizardPage.DESTINATION_NAMES_ID">
 			<item value="judt.jar"/>
 		</list>
 	</section>
 	<section name="JavaElementSearchActions">
+	</section>
+	<section name="FatJarPackageWizard">
+		<item key="FatJarPackageWizardPage.ANTSCRIPT_SAVE" value="false"/>
+		<item key="FatJarPackageWizardPage.ANTSCRIPT_LOCATION" value="E:\study\java\judt"/>
+		<item key="FatJarPackageWizardPage.LIBRARY_HANDLING" value="1"/>
+		<item key="FatJarPackageWizardPage.LAUNCH_CONFIGURATION_SELECTION_NAME" value="TestRecFile - judt"/>
+		<item key="FatJarPackageWizardPage.DESTINATION_PATH_SELECTION" value="RecFile.jar"/>
+		<list key="FatJarPackageWizardPage.DESTINATION_NAMES_ID">
+			<item value="RecFile.jar"/>
+			<item value="RecFiles.jar"/>
+			<item value="SendFiles.jar"/>
+			<item value="SendFile.jar"/>
+			<item value="Server.jar"/>
+			<item value="Client.jar"/>
+		</list>
+		<list key="FatJarPackageWizardPage.ANTSCRIPT_LOCATION_HISTORY">
+			<item value="E:\study\java\judt.xml"/>
+			<item value=".xml"/>
+		</list>
 	</section>
 </section>
