@@ -12,6 +12,7 @@
 	<item key="TypeHierarchyViewPart.linkeditors" value="false"/>
 	<item key="TypeHierarchyViewPart.orientation" value="3"/>
 	<item key="CallHierarchyViewPart.ratio0" value="498"/>
+	<item key="filters_last_used" value="filter_imports;"/>
 	<list key="SearchScopeActionGroup.working_set">
 	</list>
 	<section name="CallHierarchySearchScope">
@@ -76,5 +77,22 @@
 			<item value="E:\study\java\judt.xml"/>
 			<item value=".xml"/>
 		</list>
+	</section>
+	<section name="JavaSearchPage">
+		<item key="CASE_SENSITIVE" value="false"/>
+		<item key="INCLUDE_MASK" value="11"/>
+		<item key="HISTORY_SIZE" value="1"/>
+		<section name="HISTORY0">
+			<item key="searchFor" value="1"/>
+			<item key="scope" value="0"/>
+			<item key="pattern" value="SocketType"/>
+			<item key="limitTo" value="2"/>
+			<item key="matchLocations" value="0"/>
+			<item key="javaElement" value=""/>
+			<item key="isCaseSensitive" value="false"/>
+			<item key="includeMask" value="11"/>
+			<list key="workingSets">
+			</list>
+		</section>
 	</section>
 </section>

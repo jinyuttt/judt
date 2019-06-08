@@ -52,6 +52,11 @@ public class UDTClient {
 	private boolean close=false;
     private Thread closeThread=null;//cd
     private final int waitClose=10*1000;
+    
+    public static final long SOCKET_TYPE_STREAM=1;
+	public static final long SOCKET_TYPE_DGRAM=2;
+	private long socketType= SOCKET_TYPE_STREAM; //stream or dgram
+	
 	public UDTClient(InetAddress address, int localport)throws SocketException, UnknownHostException{
 		//create endpoint
 		clientEndpoint=new UDPEndPoint(address,localport);
@@ -81,8 +86,8 @@ public class UDTClient {
 		//create client session...
 		clientSession=new ClientSession(clientEndpoint,destination);
 		clientEndpoint.addSession(clientSession.getSocketID(), clientSession);
-
 		clientEndpoint.start();
+		clientSession.setSocketType(socketType);
 		clientSession.connect();
 		//wait for handshake
 		while(!clientSession.isReady()){
@@ -274,5 +279,29 @@ public class UDTClient {
 	{
 		//对方关闭
 	    return close||!clientSession.active;
+	}
+	
+	/**
+	 * 
+	* @Title: setSocketType
+	* @Description: 设置需要的sockettype(1,2)
+	* @param @param socketType    参数
+	* @return void    返回类型
+	 */
+	public void setSocketType(long socketType)
+	{
+           this.socketType=socketType;
+	}
+	
+	/**
+	 * 
+	* @Title: setSocketTypeDGRAM
+	* @Description: 设置sockettype为DGRAM；因为默认是Strem
+	* @param     参数
+	* @return void    返回类型
+	 */
+	public void setSocketTypeDGRAM()
+	{
+		 this.socketType=2;
 	}
 }

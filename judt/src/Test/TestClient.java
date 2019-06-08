@@ -11,8 +11,9 @@ public class TestClient {
 		while(true)
 		{
 			judpClient client=new judpClient();
-			client.connect("192.168.3.104", 5555);
-			byte[]data=("hello word "+num).getBytes();
+			client.connect("192.168.3.104", 9000);
+			byte[]data=("hello word jinyu").getBytes();
+			//16
 			client.sendData(data);
 			client.close();
 			try {

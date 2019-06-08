@@ -21,6 +21,15 @@ public class judpClient {
   private  long sumLen=0;
   private PackagetCombin pack=new PackagetCombin();
   public int dataLen=0;
+  private long socketType= UDTClient.SOCKET_TYPE_STREAM; //stream or dgram
+	
+   /**
+   * 
+        * 创建一个新的实例 judpClient.    
+   *    
+   * @param lcoalIP 本地IP
+   * @param port   本地端口
+   */
   public judpClient(String lcoalIP,int port)
   {
 	  InetAddress addr = null;
@@ -41,6 +50,8 @@ public class judpClient {
 	}
 	 
   }
+  
+  
   public judpClient()
   {
 	  try {
@@ -52,6 +63,8 @@ public class judpClient {
 	}
 	  
   }
+  
+
   public judpClient(int port)
   {
 	  try {
@@ -63,12 +76,38 @@ public class judpClient {
 	}
 	 
   }
+  
+  /**
+	 * 
+	* @Title: setSocketType
+	* @Description: 设置需要的sockettype(1,2)
+	* @param @param socketType    参数
+	* @return void    返回类型
+	 */
+	public void setSocketType(long socketType)
+	{
+		this.socketType=socketType;
+	}
+	
+	/**
+	 * 
+	* @Title: setSocketTypeDGRAM
+	* @Description: 设置sockettype为DGRAM；因为默认是Strem
+	* @param     参数
+	* @return void    返回类型
+	 */
+	public void setSocketTypeDGRAM()
+	{
+		socketType=UDTClient.SOCKET_TYPE_DGRAM;
+	}
+  
   public boolean connect(String ip,int port)
   {
 	  boolean isSucess=false;
 	  if(client!=null)
 	  {
 		  try {
+			  client.setSocketType(socketType);
 			client.connect(ip, port);
 			isSucess=true;
 		} catch (UnknownHostException e) {
@@ -83,6 +122,8 @@ public class judpClient {
 	  
 	  return isSucess;
   }
+  
+
   public int sendData(byte[] data)
   {
 	  if(data==null)
@@ -107,6 +148,15 @@ public class judpClient {
 	  }
 	  return r;
   }
+  
+  /**
+   * 
+  * @Title: sendSplitData
+  * @Description: 拆分发送
+  * @param @param data
+  * @param @return    参数
+  * @return int    返回类型
+   */
   public int sendSplitData(byte[] data)
   {
 	  if(data==null)
@@ -131,12 +181,21 @@ public class judpClient {
 	return r;
 	
   }
+ 
+  
+   /**
+    * 
+   * @Title: pauseOutput
+   * @Description: 中断
+   * @param     参数
+   * @return void    返回类型
+    */
   public void pauseOutput()
   {
       try {
         client.getOutputStream().pauseOutput();
     } catch (IOException e) {
-        // TODO Auto-generated catch block
+       
         e.printStackTrace();
     }
   }
@@ -201,6 +260,15 @@ public class judpClient {
 	  
 	  return result;
   }
+  
+  /**
+   * 
+  * @Title: read
+  * @Description: 读取数据到Data中
+  * @param @param data
+  * @param @return    参数
+  * @return int    返回类型
+   */
   public int read(byte[]data)
   {
 	   try {
@@ -214,7 +282,7 @@ public class judpClient {
   }
   
   /**
-   * 关闭
+      * 关闭
    */
   public void close()
   {
@@ -243,6 +311,7 @@ public class judpClient {
  {
 	 return client.isClose();
  }
+ 
  /**
   * 设置是读取为主还是写入为主
   * 如果是写入为主，当读取速度慢时，数据覆盖丢失

@@ -95,7 +95,6 @@ public class judpRecviceFile {
                     FileOutputStream fos=null;
                     try{
                          fos=new FileOutputStream(file);
-                    
                         System.out.println("[ReceiveFile] Reading <"+size+"> bytes.");
                         long start = System.currentTimeMillis();
                         ApplicationCode.CopySocketFile(fos, client,size,true);

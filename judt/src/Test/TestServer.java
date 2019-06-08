@@ -15,7 +15,7 @@ import judp.judpSocket;
 public class TestServer {
 	public static void main(String[] args) {
 	  //192.168.30.128
-		judpServer  server=new judpServer("192.168.3.104",5555);
+		judpServer  server=new judpServer("192.168.3.104",9000);
 		server.start();
 		while(true)
 		{
@@ -29,6 +29,7 @@ public class TestServer {
 					{
 				 byte[] data=new byte[1024];
 				 int r=0;
+				 int num=0;
 				 while(r!=-1)
 				 {
 				    r=socket.readData(data);
@@ -48,8 +49,9 @@ public class TestServer {
 				    	break;
 				    }
 				    byte[]tmp=new byte[r];
-				   System.arraycopy(data, 0, tmp, 0, r);
-				   System.out.println(new String(tmp));
+				    System.arraycopy(data, 0, tmp, 0, r);
+				    System.out.println(new String(tmp));
+				    socket.sendData(("Ω” ’ receive jinyu"+num++).getBytes());
 				 
 				 }
 				  //socket.close();

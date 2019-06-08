@@ -51,7 +51,10 @@ public class ClientSession extends UDTSession {
 	private static final Logger logger=Logger.getLogger(ClientSession.class.getName());
 
 	private UDPEndPoint endPoint;
+	private long socketType= ConnectionHandshake.SOCKET_TYPE_STREAM;
+	
     public volatile int connectNum=0;//cd
+    
 	public ClientSession(UDPEndPoint endPoint, Destination dest)throws SocketException{
 		super("ClientSession localPort="+endPoint.getLocalPort(),dest);
 		this.endPoint=endPoint;
@@ -148,7 +151,7 @@ public class ClientSession extends UDTSession {
 	protected void sendHandShake()throws IOException{
 		ConnectionHandshake handshake = new ConnectionHandshake();
 		handshake.setConnectionType(ConnectionHandshake.CONNECTION_TYPE_REGULAR);
-		handshake.setSocketType(ConnectionHandshake.SOCKET_TYPE_DGRAM);
+		handshake.setSocketType(socketType);
 		long initialSequenceNo=SequenceNumber.random();
 		setInitialSequenceNumber(initialSequenceNo);
 		handshake.setInitialSeqNo(initialSequenceNo);
@@ -167,7 +170,8 @@ public class ClientSession extends UDTSession {
 	protected void sendConfirmation(ConnectionHandshake hs)throws IOException{
 		ConnectionHandshake handshake = new ConnectionHandshake();
 		handshake.setConnectionType(-1);
-		handshake.setSocketType(ConnectionHandshake.SOCKET_TYPE_DGRAM);
+		//handshake.setSocketType(ConnectionHandshake.SOCKET_TYPE_DGRAM);
+		handshake.setSocketType(socketType);
 		handshake.setInitialSeqNo(hs.getInitialSeqNo());
 		handshake.setPacketSize(hs.getPacketSize());
 		handshake.setSocketID(mySocketID);
@@ -185,6 +189,29 @@ public class ClientSession extends UDTSession {
 	public UDTPacket getLastPkt(){
 		return lastPacket;
 	}
-
+   
+	/**
+	 * 
+	* @Title: setSocketType
+	* @Description: 设置需要的sockettype(0,1)
+	* @param @param socketType    参数
+	* @return void    返回类型
+	 */
+	public void setSocketType(long socketType)
+	{
+           this.socketType=socketType;
+	}
+	
+	/**
+	 * 
+	* @Title: setSocketTypeDGRAM
+	* @Description: 设置sockettype为DGRAM；因为默认是Strem
+	* @param     参数
+	* @return void    返回类型
+	 */
+	public void setSocketTypeDGRAM()
+	{
+		 this.socketType=ConnectionHandshake.SOCKET_TYPE_DGRAM;
+	}
 
 }
