@@ -104,6 +104,8 @@ public abstract class UDTSession {
 	protected Long initialSequenceNumber=null;
 	
 	protected final long mySocketID;
+
+	public long startTime;
 	
 	private final static AtomicLong nextSocketID=new AtomicLong(20+new Random().nextInt(5000));
 	

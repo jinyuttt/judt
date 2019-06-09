@@ -60,7 +60,7 @@ public class ServerSession extends UDTSession {
 	private UDTPacket lastPacket;
 	
 	private long cookie=0;//cd 2018-08-28
-	//private String key="judp";//标记，暂时不用了，和c++一致
+	private String key="judp";//标记，暂时不用了，和c++一致
 	private String client="";
 	int n_handshake=0;
 	public ServerSession(DatagramPacket dp, UDPEndPoint endPoint)throws SocketException,UnknownHostException{

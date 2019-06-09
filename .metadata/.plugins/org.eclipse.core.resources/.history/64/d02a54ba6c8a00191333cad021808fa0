@@ -60,7 +60,7 @@ public class ServerSession extends UDTSession {
 	private UDTPacket lastPacket;
 	
 	private long cookie=0;//cd 2018-08-28
-	//private String key="judp";//标记，暂时不用了，和c++一致
+	private String key="judp";//标记，暂时不用了，和c++一致
 	private String client="";
 	int n_handshake=0;
 	public ServerSession(DatagramPacket dp, UDPEndPoint endPoint)throws SocketException,UnknownHostException{
@@ -220,7 +220,7 @@ public class ServerSession extends UDTSession {
 		byte[] result=new byte[4];
 		ByteBuffer buf=ByteBuffer.wrap(result);
 		//修改用于c++一致
-		String src=Tools.string2MD5(GetClientCookie());
+		String src=Tools.string2MD5(client+key);
 		try {
 			bytes=src.getBytes("utf-8");
 		} catch (UnsupportedEncodingException e)
@@ -242,7 +242,7 @@ public class ServerSession extends UDTSession {
 	/**
 	 * 
 	* @Title: GetClientCookie
-	* @Description: 输出字符串Cookie
+	* @Description: TODO(这里用一句话描述这个方法的作用)
 	* @param @return    参数
 	* @return String    返回类型
 	 */

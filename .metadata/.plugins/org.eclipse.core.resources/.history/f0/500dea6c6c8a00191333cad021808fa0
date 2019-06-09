@@ -285,7 +285,6 @@ public class UDPEndPoint {
 							UDTSession session=sessions.get(id);
 							if(session==null){
 								session=new ServerSession(dp,this);
-								session.startTime=startTime;
 								addSession(session.getSocketID(),session);
 								//TODO need to check peer to avoid duplicate server session
 								if(serverSocketMode){
